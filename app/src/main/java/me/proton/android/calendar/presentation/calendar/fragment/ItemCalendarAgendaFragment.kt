@@ -73,6 +73,10 @@ class ItemCalendarAgendaFragment: Fragment() {
     private val currentRange = MutableStateFlow<EventsWindow?>(null)
     private var selectedDate: LocalDate? = null
 
+    // per-day display-latency timing
+    private var dayRequestNanos = 0L
+    private var loggedDisplayForDay = true
+
     private lateinit var eventsListLayoutAdapter: EventAdapter
 
     private var firstEventOfTheDayTime: LocalTime? = null
@@ -244,6 +248,9 @@ class ItemCalendarAgendaFragment: Fragment() {
     }
 
     private fun getEvents(date: LocalDate, timeZoneId: String) {
+        dayRequestNanos = System.nanoTime()
+        loggedDisplayForDay = false
+        logger.d("agenda day requested: $date")
         currentRange.value = EventsWindow(fromDate = date, toDate = date, timeZoneId)
     }
 
@@ -256,7 +263,6 @@ class ItemCalendarAgendaFragment: Fragment() {
             CalendarsRepository.GetEventsResult.InProgress -> {
                 val currentList = eventsListLayoutAdapter.currentList
                 if (currentList.size <= 1) {
-                    calendarViewModel.setLoading(true, position)
                     binding.listViewStatus.isVisible = true
                     binding.listViewStatus.text = resources.getString(R.string.agenda_loading_events)
                 }
@@ -278,6 +284,12 @@ class ItemCalendarAgendaFragment: Fragment() {
                         timeZoneId
                     )
                 }.sortUiEventsForAgendaView(timeZoneId)
+
+                if (!eventsResult.isSkeleton && !loggedDisplayForDay) {
+                    loggedDisplayForDay = true
+                    val displayMs = (System.nanoTime() - dayRequestNanos) / 1_000_000
+                    logger.d("agenda day displayed: $immutableDate ${sortedEvents.size} events in ${displayMs}ms (fullyLoaded=${eventsResult.fullyLoaded})")
+                }
 
                 val partDayEvents = eventsResult.events.filter {
                     !it.isAllDay && it.spansSingleDay(true) // Multi day events are displayed in the day view header
@@ -304,7 +316,6 @@ class ItemCalendarAgendaFragment: Fragment() {
                     eventsListLayoutAdapter.submitList(
                         listOf(fakeHeaderEvent).plus(sortedEvents)
                     )
-                    calendarViewModel.setLoading(false, position)
                 }
             }
             is CalendarsRepository.GetEventsResult.Exception -> {
@@ -315,14 +326,12 @@ class ItemCalendarAgendaFragment: Fragment() {
                 eventsListLayoutAdapter.submitList(
                     listOf(fakeHeaderEvent)
                 )
-                calendarViewModel.setLoading(false, position)
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        calendarViewModel.setLoading(false, position)
         _binding = null
     }
 }

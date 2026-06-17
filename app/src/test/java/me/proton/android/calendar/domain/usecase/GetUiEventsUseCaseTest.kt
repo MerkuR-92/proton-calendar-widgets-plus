@@ -3,7 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.coVerifySequence
+import io.mockk.coVerifyOrder
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.drop
@@ -29,6 +29,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Date
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class GetUiEventsUseCaseTest {
@@ -169,7 +170,7 @@ class GetUiEventsUseCaseTest {
         execute(from, to).test {
             // When / Then
             awaitItem()
-            coVerifySequence {
+            coVerifyOrder {
                 decryptor.setCalendars(any())
                 decryptor.getFromCache("e1", calendarId, any())
                 eventsDao.selectById("e1")
@@ -394,6 +395,66 @@ class GetUiEventsUseCaseTest {
         }
     }
 
+    @Test
+    fun `skips skeleton for already-seen window`() = runTest {
+        val start = from.atStartOfDay(zone).plusHours(9)
+        val end = start.plusHours(1)
+        val occ = mockOccurrence(
+            userId = userId.id,
+            calendarId = calendarId,
+            eventId = "e1",
+            eventUid = "uid1",
+            modifyTime = 1L,
+            windowStart = fromSec,
+            windowEnd = toSec,
+            startTime = start.toInstant().epochSecond
+        )
+        coEvery { decryptor.getFromCache("e1", calendarId, any()) } returns
+            createEvent("e1", "uid1", tz, start, end, isSingleEdit = false)
+        every { occurrencesDao.selectNonRecurringBetweenInclusive(any(), any(), any(), any()) } returns flowOf(listOf(occ))
+        every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(emptyList())
+        every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(emptyList())
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
+
+        // shared cache so the second load sees the window as already loaded
+        val sharedCache = UiEventExpansionCache()
+        fun load() = GetUiEventsUseCase(
+            database = database,
+            eventDecryptor = decryptor,
+            calendarsRepository = calendarsRepo,
+            getUserInfoUseCase = getUserInfo,
+            loadingStateUseCase = loadingState,
+            priorityRunner = PriorityDecryptionRunner(),
+            skeletonCalculator = mockk {
+                coEvery { computeSkeletonUiEvents(any(), any(), any(), any()) } returns emptyList()
+            },
+            expansionCache = sharedCache,
+        ).execute(
+            userId = userId,
+            fromDate = from,
+            toDate = to,
+            timeZoneId = tz,
+            onlyVisibleCalendars = false,
+            priority = DecryptionPriority.Visible,
+        )
+
+        // first load emits the skeleton then real events which marks the window seen
+        load().test {
+            val first = awaitItem() as CalendarsRepository.GetEventsResult.Success
+            assertTrue(first.isSkeleton, "first load of a window emits the skeleton")
+            var item = first
+            while (item.isSkeleton) item = awaitItem() as CalendarsRepository.GetEventsResult.Success
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // second load of the same window skips the skeleton so the first item is real events
+        load().test {
+            val first = awaitItem() as CalendarsRepository.GetEventsResult.Success
+            assertFalse(first.isSkeleton, "already-seen window skips the skeleton")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun execute(from: LocalDate, to: LocalDate) = GetUiEventsUseCase(
         database = database,
         eventDecryptor = decryptor,
@@ -404,6 +465,7 @@ class GetUiEventsUseCaseTest {
         skeletonCalculator = mockk {
             coEvery { computeSkeletonUiEvents(any(), any(), any(), any()) } returns emptyList()
         },
+        expansionCache = UiEventExpansionCache(),
     ).execute(
         userId = userId,
         fromDate = from,

@@ -39,7 +39,10 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
         val fromDate = timeWindow.first
         val toDate = timeWindow.second
 
+        val fetchStart = System.nanoTime()
         val (result, entitiesAndMetadatas) = fetchEventsUseCase.splitFetchEvents(userId, listOf(calendarId), fromDate, toDate, zoneId.id)
+        val fetchMs = (System.nanoTime() - fetchStart) / 1_000_000
+        logger.d("GetMinimalCalendarEvents fetch: ${fetchMs}ms ok=${result is UseCase.Result.Success<*>} events=${entitiesAndMetadatas?.size ?: 0}")
         result.logErrors(logger)
 
         if (result is UseCase.Result.Success<*>) {

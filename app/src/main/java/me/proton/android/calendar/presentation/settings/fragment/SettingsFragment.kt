@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.settings.fragment
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -9,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
+import me.proton.android.calendar.common.logger.LogExporter
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -61,6 +65,7 @@ import me.proton.core.compose.theme.ProtonTheme
 import me.proton.core.devicemigration.presentation.settings.SignInToAnotherDeviceItem
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.io.File
 
 @AndroidEntryPoint
 class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComponent {
@@ -105,6 +110,38 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentSettingsBinding.inflate(inflater, container, false)
 
+    private var pendingLogZip: File? = null
+
+    private val saveLogsLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/zip")
+    ) { uri ->
+        val src = pendingLogZip
+        pendingLogZip = null
+        if (uri == null || src == null) return@registerForActivityResult
+        runCatching { LogExporter.copyToUri(requireContext(), src, uri) }
+            .onSuccess { Toast.makeText(requireContext(), getString(R.string.settings_logs_saved), Toast.LENGTH_SHORT).show() }
+            .onFailure { Toast.makeText(requireContext(), getString(R.string.settings_logs_save_failed), Toast.LENGTH_SHORT).show() }
+    }
+
+    private fun exportLogs() {
+        val zip = LogExporter.buildZip(requireContext())
+        if (zip == null) {
+            Toast.makeText(requireContext(), getString(R.string.settings_logs_none), Toast.LENGTH_SHORT).show()
+            return
+        }
+        pendingLogZip = zip
+        saveLogsLauncher.launch(LogExporter.EXPORT_FILE_NAME)
+    }
+
+    private fun shareLogs() {
+        val intent = LogExporter.buildShareIntent(requireContext())
+        if (intent == null) {
+            Toast.makeText(requireContext(), getString(R.string.settings_logs_none), Toast.LENGTH_SHORT).show()
+            return
+        }
+        startActivity(Intent.createChooser(intent, getString(R.string.settings_share_logs)))
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -123,6 +160,14 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                                     onClick = onClick
                                 )
                             }
+                        )
+                        ProtonSettingsItem(
+                            name = getString(R.string.settings_share_logs),
+                            onClick = { shareLogs() }
+                        )
+                        ProtonSettingsItem(
+                            name = getString(R.string.settings_save_logs),
+                            onClick = { exportLogs() }
                         )
                     }
                 }

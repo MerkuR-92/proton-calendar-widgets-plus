@@ -332,6 +332,41 @@ internal class EventUtilsTest {
 
     }
 
+    @Test
+    fun `worst case expansion benchmark`() {
+        val tzId = "Europe/Zurich"
+        val toDate = LocalDate.of(2026, 6, 16)
+        data class Case(val name: String, val dtStart: LocalDateTime, val rrule: String)
+        val cases = listOf(
+            Case("DAILY from 2016 (~10y)", LocalDateTime.of(2016, 1, 1, 9, 0, 0), "FREQ=DAILY"),
+            Case("DAILY;BYHOUR=9..17 from 2016", LocalDateTime.of(2016, 1, 1, 9, 0, 0), "FREQ=DAILY;BYHOUR=9,10,11,12,13,14,15,16,17"),
+            Case("HOURLY from 2020 (~6y)", LocalDateTime.of(2020, 1, 1, 9, 0, 0), "FREQ=HOURLY"),
+            Case("HOURLY from 2006 (~20y)", LocalDateTime.of(2006, 1, 1, 9, 0, 0), "FREQ=HOURLY"),
+            Case("MINUTELY from 2025-06 (~1y)", LocalDateTime.of(2025, 6, 1, 9, 0, 0), "FREQ=MINUTELY"),
+        )
+        for (c in cases) {
+            val event = recurringEvent(
+                """
+                BEGIN:VCALENDAR
+                VERSION:2.0
+                PRODID:-//Proton//AndroidCalendar//EN
+                BEGIN:VEVENT
+                DTSTAMP:20200101T090000Z
+                DTSTART;TZID=$tzId:${fmt(c.dtStart)}
+                DTEND;TZID=$tzId:${fmt(c.dtStart.plusMinutes(30))}
+                RRULE:${c.rrule}
+                UID:worst-${c.name.hashCode()}@proton.me
+                END:VEVENT
+                END:VCALENDAR
+                """
+            )
+            val t0 = System.nanoTime()
+            val occ = event.generateOccurrencesUntil(toDate, tzId)
+            val ms = (System.nanoTime() - t0) / 1_000_000
+            println("WORSTCASE | ${c.name} | occurrences=${occ?.size} | ${ms}ms")
+        }
+    }
+
     private fun recurringEvent(iCalString: String): Event = Event.from(
         "id",
         Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR, 0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),

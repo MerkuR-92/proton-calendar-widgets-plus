@@ -78,6 +78,7 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
+import me.proton.android.calendar.domain.indicators.FastWindowExpansion
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
@@ -573,7 +574,9 @@ class CalendarsRepositoryImpl @Inject constructor(
         val potentialOccurrences = when {
             dtStart.toInstant() >= toEndInstant -> emptyList()
             untilInstant != null && untilInstant.isBefore(fromStartInstant) -> emptyList()
-            else -> originalEvent.generateOccurrencesUntil(toDate, timeZoneId) ?: return null
+            // fast path for plain daily/weekly so an old dtstart doesn't walk every occurrence
+            else -> originalEvent.fastRecurringOccurrencesInWindow(tz, fromStartInstant, toEndInstant)
+                ?: originalEvent.generateOccurrencesUntil(toDate, timeZoneId) ?: return null
         }
 
         val exInstants = originalEvent.iCalEvent.exceptionDates
@@ -646,6 +649,31 @@ class CalendarsRepositoryImpl @Inject constructor(
         } else {
             originalUiEvents + singleEditUiEvents
         }
+    }
+
+    // fast-path occurrences for plain daily/weekly matching biweekly's full generation
+    private fun Event.fastRecurringOccurrencesInWindow(
+        displayZone: ZoneId,
+        windowStartInstant: Instant,
+        windowEndInstant: Instant,
+    ): List<Event.Occurrence>? {
+        if (isAllDay()) return null
+        val recurrence = iCalEvent.recurrenceRule?.value ?: return null
+        val startDate = iCalEvent.dateStart?.value ?: return null
+        val endTimeMillis = iCalEvent.dateEnd?.value?.time ?: return null
+        val expansionZone = ZoneId.of(
+            iCalendar.timezoneInfo.getTimezone(iCalEvent.dateStart)?.timeZone?.id ?: "UTC"
+        )
+        val fast = FastWindowExpansion.occurrencesInWindow(
+            recurrence = recurrence,
+            dtStartInstant = startDate.toInstant(),
+            durationSeconds = (endTimeMillis - startDate.time) / 1000L,
+            fullDay = false,
+            expansionZone = expansionZone,
+            windowStartInstant = windowStartInstant,
+            windowEndInstant = windowEndInstant,
+        ) ?: return null
+        return fast.map { Event.Occurrence(it.start.atZone(displayZone), it.end.atZone(displayZone), it.number) }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -927,9 +955,25 @@ class CalendarsRepositoryImpl @Inject constructor(
         uids: Collection<String>,
     ): Map<String, List<EventEntity>> {
         if (uids.isEmpty()) return emptyMap()
-        val markers = uids.map(::uidMarker)
-        val candidates = fetchUidCandidates(markers) { database.eventsDao().selectEventsMatchingRaw(it) }
-        return candidates.attributeByUids(uids)
+        val uidSet = uids.toSet()
+
+        // resolve uids via the indexed eventUid column then load events by id instead of the slow sharedEvents LIKE scan
+        val refs = database.eventOccurrencesDao().selectEventRefsByUids(uidSet)
+        val eventsById = database.eventsDao()
+            .selectByIdIn(refs.map { it.eventId }.toSet())
+            .associateBy { it.id }
+        val eventIdsByUid = refs.groupBy({ it.eventUid }, { it.eventId })
+        val byUid = uidSet.associateWith { uid ->
+            eventIdsByUid[uid].orEmpty().distinct().mapNotNull { eventsById[it] }
+        }
+
+        // fall back to the LIKE scan for any uid with no occurrence rows
+        val missing = uidSet.filter { byUid[it].isNullOrEmpty() }
+        if (missing.isEmpty()) return byUid
+        val fallback = fetchUidCandidates(missing.map(::uidMarker)) {
+            database.eventsDao().selectEventsMatchingRaw(it)
+        }.attributeByUids(missing)
+        return byUid + fallback
     }
 
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
@@ -946,6 +990,9 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun persistEvents(vararg events: EventEntity) {
         val eventsByCalendar = events.groupBy { it.calendarId }
+        if (events.isNotEmpty()) {
+            logger.d("persistEvents: ${events.size} events across ${eventsByCalendar.size} calendars")
+        }
         database.inTransaction {
             eventsByCalendar.forEach { (calendarId, eventsForCalendar) ->
                 val calendarUserId = database.calendarsDao().selectCalendarUserId(calendarId)

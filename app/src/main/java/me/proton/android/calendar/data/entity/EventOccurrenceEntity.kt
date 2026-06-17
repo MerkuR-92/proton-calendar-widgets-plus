@@ -15,7 +15,7 @@ import me.proton.android.calendar.data.db.AppDatabase
         childColumns = ["eventId"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index(value = ["eventId"])]
+    indices = [Index(value = ["eventId"]), Index(value = ["eventUid"])]
 )
 @Serializable
 data class EventOccurrenceEntity(

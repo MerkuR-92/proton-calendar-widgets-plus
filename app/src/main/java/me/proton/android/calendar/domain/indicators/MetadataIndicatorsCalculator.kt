@@ -1,8 +1,6 @@
 package me.proton.android.calendar.domain.indicators
 
 import biweekly.property.Status
-import biweekly.util.Frequency
-import biweekly.util.Recurrence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
@@ -16,7 +14,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.GetUserInfoUseCase
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -310,25 +307,13 @@ class MetadataIndicatorsCalculator @Inject constructor(
         val expansionZone = ZoneId.of(expansionTimeZoneId)
         val displayZone = ZoneId.of(formatTimeZoneId)
         val durationSec = dtEndInstant.epochSecond - dtStartInstant.epochSecond
-        val timed = !fullDay && durationSec > 0
 
         // the common repeating events (plain daily and weekly-on-weekdays) take the fast date-math path
         val winStart = fromDate.atStartOfDay(displayZone).toInstant()
         val winEnd = toDate.plusDays(1).atStartOfDay(displayZone).toInstant()
-        if (timed && isSimpleInfiniteDaily(recurrence)) {
-            return FastOccurrenceGenerator.dailyOccurrencesInWindow(
-                dtStartInstant, durationSec, recurrence.interval ?: 1, expansionZone, winStart, winEnd,
-            )
-        }
-        if (timed && isSimpleInfiniteWeekly(recurrence)) {
-            val byDays = recurrence.byDay.mapNotNull { bd -> bd.day?.let { runCatching { DayOfWeek.valueOf(it.name) }.getOrNull() } }.toSet()
-            val wkst = recurrence.workweekStarts?.let { runCatching { DayOfWeek.valueOf(it.name) }.getOrNull() } ?: DayOfWeek.MONDAY
-            if (byDays.size == recurrence.byDay.size) { // all weekdays converted cleanly
-                FastOccurrenceGenerator.weeklyOccurrencesInWindow(
-                    dtStartInstant, durationSec, recurrence.interval ?: 1, byDays, wkst, expansionZone, winStart, winEnd,
-                )?.let { return it }
-            }
-        }
+        FastWindowExpansion.occurrencesInWindow(
+            recurrence, dtStartInstant, durationSec, fullDay, expansionZone, winStart, winEnd,
+        )?.let { return it }
 
         // everything else (monthly, yearly, anything with COUNT/UNTIL or fancier BY* rules) is rarer and cheaper:
         // build a throwaway event and let biweekly expand it. the caller trims the result to the window.
@@ -341,28 +326,6 @@ class MetadataIndicatorsCalculator @Inject constructor(
         val dummy = generateDummyEvent(startLocal, endLocal, rrule, expansionZone, fullDay) ?: return null
         val occurrences = dummy.generateOccurrencesUntil(toDate, formatTimeZoneId) ?: return null
         return occurrences.map { ExpandedOccurrence(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
-    }
-
-    // plain FREQ=DAILY with no BY* parts and no COUNT/UNTIL — i.e. infinite, fixed-interval daily
-    private fun isSimpleInfiniteDaily(recurrence: Recurrence): Boolean {
-        if (recurrence.frequency != Frequency.DAILY) return false
-        if (recurrence.count != null || recurrence.until != null) return false
-        return recurrence.byDay.isEmpty() && recurrence.byMonth.isEmpty() &&
-            recurrence.byMonthDay.isEmpty() && recurrence.byYearDay.isEmpty() &&
-            recurrence.byWeekNo.isEmpty() && recurrence.bySetPos.isEmpty() &&
-            recurrence.byHour.isEmpty() && recurrence.byMinute.isEmpty() &&
-            recurrence.bySecond.isEmpty()
-    }
-
-    // plain FREQ=WEEKLY;BYDAY=... (weekday list, no ordinals), no COUNT/UNTIL, no other BY* parts
-    private fun isSimpleInfiniteWeekly(recurrence: Recurrence): Boolean {
-        if (recurrence.frequency != Frequency.WEEKLY) return false
-        if (recurrence.count != null || recurrence.until != null) return false
-        if (recurrence.byDay.isEmpty() || recurrence.byDay.any { it.num != null }) return false
-        return recurrence.byMonth.isEmpty() && recurrence.byMonthDay.isEmpty() &&
-            recurrence.byYearDay.isEmpty() && recurrence.byWeekNo.isEmpty() &&
-            recurrence.bySetPos.isEmpty() && recurrence.byHour.isEmpty() &&
-            recurrence.byMinute.isEmpty() && recurrence.bySecond.isEmpty()
     }
 
     private fun generateDummyEvent(

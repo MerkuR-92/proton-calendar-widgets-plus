@@ -280,6 +280,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                                 if (eventsResponse is ApiResponse.Success) {
 
                                     if (!eventMetadatasChannel.isClosedForSend && eventsResponse.data.events.isNotEmpty()) {
+                                        logger.d("fetchMetadataOnly: type=$type received=${eventsResponse.data.events.size}")
                                         eventMetadatasChannel.send(eventsResponse.data.events) // PRODUCE
                                     }
 

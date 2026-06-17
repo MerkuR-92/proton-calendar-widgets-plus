@@ -80,7 +80,7 @@ class PriorityDecryptionRunner @Inject constructor() {
     }
 
     companion object {
-        // Delay offscreen submissions so a concurrent visible caller reaches the queue first and gets picked first.
-        private const val STAGGER_MS = 1000L
+        // small head-start so a concurrent visible caller reaches the queue before an offscreen one
+        private const val STAGGER_MS = 150L
     }
 }

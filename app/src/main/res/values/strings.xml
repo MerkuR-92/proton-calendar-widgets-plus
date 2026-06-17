@@ -327,6 +327,12 @@
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
     <string name="nav_view_version_info" translatable="false">Proton Calendar %1$s (%2$d)</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
+    <string name="settings_share_logs" translatable="false">Share logs</string>
+    <string name="settings_save_logs" translatable="false">Save logs to disk</string>
+    <string name="settings_logs_none" translatable="false">No logs captured yet</string>
+    <string name="settings_logs_saved" translatable="false">Logs saved</string>
+    <string name="settings_logs_save_failed" translatable="false">Failed to save logs</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
     <string name="snack_event_deleted">Event deleted</string>

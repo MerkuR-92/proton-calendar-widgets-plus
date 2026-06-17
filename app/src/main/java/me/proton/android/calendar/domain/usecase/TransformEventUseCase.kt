@@ -54,7 +54,10 @@ class TransformEventUseCase @Inject constructor(
         keyCache.withActiveDecryption { executeInternal(eventEntity, allowApiCall) }
 
     private suspend fun executeInternal(eventEntity: EventEntity, allowApiCall: Boolean): Event? {
-        val ctx = keyCache.calendarContext(eventEntity.calendarId) ?: return null
+        val ctx = keyCache.calendarContext(eventEntity.calendarId) ?: run {
+            logger.d("transform DROP: no calendar context (calendar/keys/passphrase missing)")
+            return null
+        }
         val calendarEntity = ctx.calendarEntity
         val userId = ctx.userId
         val calendar = ctx.calendar
@@ -64,6 +67,7 @@ class TransformEventUseCase @Inject constructor(
         val userAddresses = keyCache.userAddresses(userId)
         if (userAddresses == null) {
             logger.e("TransformEventUseCase, userAddresses is null")
+            logger.d("transform DROP: userAddresses null")
             return null
         }
 
@@ -168,11 +172,22 @@ class TransformEventUseCase @Inject constructor(
 
         }
 
-        if (calendarParts.isEmpty()) return null
+        if (calendarParts.isEmpty()) {
+            logger.d("transform DROP: no decryptable parts (statuses=${decryptionStatuses.distinct()})")
+            return null
+        }
 
         val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)
 
-        if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) return null
+        if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) {
+            val reason = when {
+                iCalendar == null -> "iCal merge null"
+                iCalendar.events.isEmpty() -> "no VEVENTs"
+                else -> "sanitise failed"
+            }
+            logger.d("transform DROP: decrypted OK but parse failed ($reason)")
+            return null
+        }
 
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
