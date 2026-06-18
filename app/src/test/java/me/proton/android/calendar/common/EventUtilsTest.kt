@@ -399,9 +399,16 @@ internal class EventUtilsTest {
         from: LocalDate,
         to: LocalDate,
         expectNonEmpty: Boolean,
+        count: Int? = null,
+        until: String? = null,
     ) {
         val zone = ZoneId.of(tzId)
-        val rrule = if (interval == 1) "FREQ=DAILY" else "FREQ=DAILY;INTERVAL=$interval"
+        val rrule = buildString {
+            append("FREQ=DAILY")
+            if (interval != 1) append(";INTERVAL=$interval")
+            if (count != null) append(";COUNT=$count")
+            if (until != null) append(";UNTIL=$until")
+        }
         val event = recurringEvent(
             """
             BEGIN:VCALENDAR
@@ -419,6 +426,7 @@ internal class EventUtilsTest {
         )
         val winStart = from.atStartOfDay(zone).toInstant()
         val winEnd = to.plusDays(1).atStartOfDay(zone).toInstant()
+        val rec = event.iCalEvent.recurrenceRule.value
         val oracle = event.generateOccurrencesUntil(to, tzId)!!
             .overlapping(from, to, tzId)
             .map { Triple(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
@@ -429,6 +437,8 @@ internal class EventUtilsTest {
             expansionZone = zone,
             windowStartInstant = winStart,
             windowEndInstant = winEnd,
+            untilInstant = rec.until?.toInstant(),
+            maxCount = rec.count,
         )
             .filter { it.end.isAfter(winStart) && it.start.isBefore(winEnd) }
             .map { Triple(it.start, it.end, it.number) }
@@ -450,12 +460,16 @@ internal class EventUtilsTest {
         from: LocalDate,
         to: LocalDate,
         expectNonEmpty: Boolean,
+        count: Int? = null,
+        until: String? = null,
     ) {
         val zone = ZoneId.of(tzId)
         val dt = LocalDateTime.of(dtStartDate, time)
         val intervalPart = if (interval == 1) "" else ";INTERVAL=$interval"
         val wkstPart = wkst?.let { ";WKST=$it" } ?: ""
-        val rrule = "FREQ=WEEKLY$intervalPart;BYDAY=$byday$wkstPart"
+        val countPart = count?.let { ";COUNT=$it" } ?: ""
+        val untilPart = until?.let { ";UNTIL=$it" } ?: ""
+        val rrule = "FREQ=WEEKLY$intervalPart;BYDAY=$byday$wkstPart$countPart$untilPart"
         val event = recurringEvent(
             """
             BEGIN:VCALENDAR
@@ -473,6 +487,7 @@ internal class EventUtilsTest {
         )
         val winStart = from.atStartOfDay(zone).toInstant()
         val winEnd = to.plusDays(1).atStartOfDay(zone).toInstant()
+        val rec = event.iCalEvent.recurrenceRule.value
         val oracle = event.generateOccurrencesUntil(to, tzId)!!
             .overlapping(from, to, tzId)
             .map { Triple(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
@@ -485,6 +500,8 @@ internal class EventUtilsTest {
             expansionZone = zone,
             windowStartInstant = winStart,
             windowEndInstant = winEnd,
+            untilInstant = rec.until?.toInstant(),
+            maxCount = rec.count,
         )!!
             .filter { it.end.isAfter(winStart) && it.start.isBefore(winEnd) }
             .map { Triple(it.start, it.end, it.number) }
@@ -603,6 +620,53 @@ internal class EventUtilsTest {
             "SU", setOf(DayOfWeek.SUNDAY), 1, null, DayOfWeek.MONDAY,
             "Europe/London", LocalDate.of(2026, 10, 18), LocalDate.of(2026, 11, 1), expectNonEmpty = true,
         )
+    }
+
+    @Test
+    fun `arithmetic daily matches biweekly with COUNT and UNTIL bounds`() {
+        val h = 3600L
+        val start = LocalDateTime.of(2020, 1, 1, 9, 30) // occurrences at 09:30 each day
+        val from = LocalDate.of(2026, 5, 25)
+        val to = LocalDate.of(2026, 6, 14)
+        // COUNT runs out before / inside / after the window (occurrence #2337 opens the window in UTC)
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = false, count = 10)
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = true, count = 2340)
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = true, count = 3000)
+        // UNTIL before / inside / after the window
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = false, until = "20240101T093000Z")
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = true, until = "20260530T093000Z")
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = true, until = "20300101T093000Z")
+        // inclusive UNTIL boundary: exactly on an occurrence instant vs one second before it
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = true, until = "20260601T093000Z")
+        assertDailyMatchesOracle(start, h, 1, "UTC", from, to, expectNonEmpty = true, until = "20260601T092959Z")
+        // bounds combined with DST and with a multi-day duration
+        assertDailyMatchesOracle(start, h, 1, "Europe/London", from, to, expectNonEmpty = true, count = 2340)
+        assertDailyMatchesOracle(start, 50 * h, 1, "UTC", from, to, expectNonEmpty = true, until = "20260530T093000Z")
+    }
+
+    @Test
+    fun `arithmetic weekly matches biweekly with COUNT and UNTIL bounds`() {
+        val mwf = setOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
+        val t = LocalTime.of(9, 30)
+        val h = 3600L
+        val dtStart = LocalDate.of(2024, 1, 1) // Monday; MO,WE,FR -> 3 per week
+        val from = LocalDate.of(2026, 5, 25) // a Monday, occurrence #376 in UTC
+        val to = LocalDate.of(2026, 6, 14)
+        fun assertWeekly(tz: String, dur: Long, nonEmpty: Boolean, count: Int? = null, until: String? = null) =
+            assertWeeklyMatchesOracle(
+                dtStart, t, dur, "MO,WE,FR", mwf, 1, null, DayOfWeek.MONDAY, tz, from, to, nonEmpty, count, until,
+            )
+        // COUNT runs out before / inside / after the window
+        assertWeekly("UTC", h, nonEmpty = false, count = 10)
+        assertWeekly("UTC", h, nonEmpty = true, count = 378)
+        assertWeekly("UTC", h, nonEmpty = true, count = 100_000)
+        // UNTIL before / inside (inclusive Friday boundary) / after the window
+        assertWeekly("UTC", h, nonEmpty = false, until = "20240601T093000Z")
+        assertWeekly("UTC", h, nonEmpty = true, until = "20260529T093000Z")
+        assertWeekly("UTC", h, nonEmpty = true, until = "20300101T093000Z")
+        // bounds combined with DST and with a multi-day duration
+        assertWeekly("Europe/London", h, nonEmpty = true, count = 378)
+        assertWeekly("UTC", 26 * h, nonEmpty = true, until = "20260529T093000Z")
     }
 
 }

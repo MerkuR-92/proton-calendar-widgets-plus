@@ -20,8 +20,10 @@ internal object FastOccurrenceGenerator {
     private const val SAFETY_CAP = 100_000
 
     /**
-     * Plain daily repeat (FREQ=DAILY, no other BY* rules, no COUNT/UNTIL)
-     * Occurrence n is (n-1) intervals after the first, so we jump to the window directly
+     * Plain daily repeat (FREQ=DAILY, no other BY* rules).
+     * Occurrence n is (n-1) intervals after the first, so we jump to the window directly.
+     * [untilInstant] (inclusive bound on occurrence start) and [maxCount] (1-based cap on occurrence number)
+     * only truncate the tail of the series; in-window occurrences and their numbers are unchanged.
      */
     fun dailyOccurrencesInWindow(
         dtStartInstant: Instant,
@@ -30,6 +32,8 @@ internal object FastOccurrenceGenerator {
         expansionZone: ZoneId,
         windowStartInstant: Instant,
         windowEndInstant: Instant,
+        untilInstant: Instant? = null,
+        maxCount: Int? = null,
     ): List<ExpandedOccurrence> {
         if (intervalDays < 1 || durationSeconds <= 0) return emptyList()
 
@@ -50,7 +54,11 @@ internal object FastOccurrenceGenerator {
 
         val result = ArrayList<ExpandedOccurrence>()
         var start = startOf(occurrence)
-        while (start.isBefore(windowEndInstant)) {
+        // both bounds are monotonic in occurrence/start, so they just stop the walk early
+        while (start.isBefore(windowEndInstant) &&
+            (maxCount == null || occurrence <= maxCount) &&
+            (untilInstant == null || !start.isAfter(untilInstant))
+        ) {
             result.add(ExpandedOccurrence(start, start.plusSeconds(durationSeconds), occurrence))
             occurrence++
             start = startOf(occurrence)
@@ -59,9 +67,11 @@ internal object FastOccurrenceGenerator {
     }
 
     /**
-     * Plain weekly repeat on a set of weekdays (FREQ=WEEKLY;BYDAY=..., no ordinals like 2MO, no COUNT/UNTIL).
+     * Plain weekly repeat on a set of weekdays (FREQ=WEEKLY;BYDAY=..., no ordinals like 2MO).
      * Repeats every [intervalWeeks] weeks on each [byDays] day at the start time;
      * the first week skips days before the start.
+     * [untilInstant] (inclusive bound on occurrence start) and [maxCount] (1-based cap on occurrence number)
+     * only truncate the tail of the series; in-window occurrences and their numbers are unchanged.
      */
     fun weeklyOccurrencesInWindow(
         dtStartInstant: Instant,
@@ -72,6 +82,8 @@ internal object FastOccurrenceGenerator {
         expansionZone: ZoneId,
         windowStartInstant: Instant,
         windowEndInstant: Instant,
+        untilInstant: Instant? = null,
+        maxCount: Int? = null,
     ): List<ExpandedOccurrence>? {
         if (intervalWeeks < 1 || durationSeconds <= 0 || byDays.isEmpty()) return null
 
@@ -114,15 +126,21 @@ internal object FastOccurrenceGenerator {
             if (firstOff != null && !weekStartDate.startOf(firstOff).isBefore(windowEndInstant)) break
 
             // count keeps advancing through skipped weeks, so it stays correct in the window
+            var done = false
             for (off in offsetsThisWeek) {
                 val start = weekStartDate.startOf(off)
-                if (!start.isBefore(windowEndInstant)) break
+                if (!start.isBefore(windowEndInstant)) { done = true; break }
+                // UNTIL bounds the start inclusively; once past it no later occurrence exists
+                if (untilInstant != null && start.isAfter(untilInstant)) { done = true; break }
                 count++
+                // this occurrence's number exceeds COUNT, so it (and everything after) doesn't exist
+                if (maxCount != null && count > maxCount) { done = true; break }
                 val end = start.plusSeconds(durationSeconds)
                 if (end.isAfter(windowStartInstant)) {
                     result.add(ExpandedOccurrence(start, end, count))
                 }
             }
+            if (done) break
             activeWeek++
         }
         return result

@@ -24,60 +24,60 @@ class FastWindowExpansionTest {
 
     private fun recurrence(rrule: String) = ICalUtilsImpl.parseRecurrence(rrule)!!
 
-    // classification: only plain infinite daily/weekly-on-weekdays qualify
+    // classification: plain daily/weekly-on-weekdays qualify; COUNT/UNTIL are allowed (applied as bounds)
 
     @Test
-    fun `simple infinite daily qualifies`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=DAILY"))).isTrue()
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=DAILY;INTERVAL=3"))).isTrue()
+    fun `simple daily qualifies, with or without COUNT or UNTIL`() {
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=DAILY"))).isTrue()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=DAILY;INTERVAL=3"))).isTrue()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=DAILY;COUNT=10"))).isTrue()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=DAILY;UNTIL=20251231T000000Z"))).isTrue()
     }
 
     @Test
-    fun `daily with COUNT or UNTIL or BY parts does not qualify`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=DAILY;COUNT=10"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=DAILY;UNTIL=20251231T000000Z"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=DAILY;BYDAY=MO"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=DAILY;BYMONTH=1"))).isFalse()
+    fun `daily with BY parts does not qualify`() {
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=DAILY;BYDAY=MO"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=DAILY;BYMONTH=1"))).isFalse()
     }
 
     @Test
     fun `weekly and monthly do not qualify as daily`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=WEEKLY;BYDAY=MO"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=MONTHLY"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=WEEKLY;BYDAY=MO"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=MONTHLY"))).isFalse()
     }
 
     @Test
-    fun `simple infinite weekly with weekday list qualifies`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO,WE,FR"))).isTrue()
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY;INTERVAL=2;BYDAY=TU"))).isTrue()
+    fun `simple weekly with weekday list qualifies, with or without COUNT or UNTIL`() {
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO,WE,FR"))).isTrue()
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY;INTERVAL=2;BYDAY=TU"))).isTrue()
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO;COUNT=5"))).isTrue()
+        assertThat(
+            FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO;UNTIL=20251231T000000Z"))
+        ).isTrue()
     }
 
     @Test
     fun `weekly without BYDAY does not qualify`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY"))).isFalse()
     }
 
     @Test
     fun `weekly with ordinal BYDAY does not qualify`() {
         // ordinal byday (second monday), not a plain weekday list
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY;BYDAY=2MO"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY;BYDAY=2MO"))).isFalse()
     }
 
     @Test
-    fun `weekly with COUNT or UNTIL or extra BY parts does not qualify`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO;COUNT=5"))).isFalse()
-        assertThat(
-            FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO;UNTIL=20251231T000000Z"))
-        ).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO;BYMONTH=1"))).isFalse()
+    fun `weekly with extra BY parts does not qualify`() {
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=WEEKLY;BYDAY=MO;BYMONTH=1"))).isFalse()
     }
 
     @Test
     fun `monthly and yearly never qualify`() {
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=MONTHLY"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=MONTHLY"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteDaily(recurrence("FREQ=YEARLY"))).isFalse()
-        assertThat(FastWindowExpansion.isSimpleInfiniteWeekly(recurrence("FREQ=YEARLY"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=MONTHLY"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=MONTHLY"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleDaily(recurrence("FREQ=YEARLY"))).isFalse()
+        assertThat(FastWindowExpansion.isSimpleWeekly(recurrence("FREQ=YEARLY"))).isFalse()
     }
 
     // occurrencesInWindow returns null for anything it can't fast-path so the caller falls back
@@ -110,8 +110,17 @@ class FastWindowExpansionTest {
     }
 
     @Test
-    fun `bounded daily falls back`() {
-        assertThat(occurrencesInWindow("FREQ=DAILY;COUNT=3")).isNull()
+    fun `bounded daily and weekly are fast-pathed`() {
+        // COUNT/UNTIL no longer fall back; they are applied as bounds inside the generator
+        assertThat(occurrencesInWindow("FREQ=DAILY;COUNT=3")).isNotNull()
+        assertThat(occurrencesInWindow("FREQ=DAILY;UNTIL=20260101T090000Z")).isNotNull()
+        assertThat(occurrencesInWindow("FREQ=WEEKLY;BYDAY=MO;COUNT=3")).isNotNull()
+    }
+
+    @Test
+    fun `date-only UNTIL falls back`() {
+        // a date-only UNTIL on a timed recurrence is left to biweekly to avoid instant-comparison drift
+        assertThat(occurrencesInWindow("FREQ=DAILY;UNTIL=20260101")).isNull()
     }
 
     @Test

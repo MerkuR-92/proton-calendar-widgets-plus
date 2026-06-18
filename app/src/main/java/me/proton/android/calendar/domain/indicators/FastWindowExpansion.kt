@@ -23,16 +23,23 @@ internal object FastWindowExpansion {
         windowEndInstant: Instant,
     ): List<ExpandedOccurrence>? {
         if (fullDay || durationSeconds <= 0) return null
+        // a date-only UNTIL on a timed recurrence is the one spot where instant comparison could drift from
+        // biweekly, so leave those to the full path; a DATE-TIME UNTIL is instant-comparable and safe
+        if (recurrence.until != null && !recurrence.until.hasTime()) return null
+        val untilInstant = recurrence.until?.toInstant()
+        val maxCount = recurrence.count
         return when {
-            isSimpleInfiniteDaily(recurrence) -> FastOccurrenceGenerator.dailyOccurrencesInWindow(
+            isSimpleDaily(recurrence) -> FastOccurrenceGenerator.dailyOccurrencesInWindow(
                 dtStartInstant = dtStartInstant,
                 durationSeconds = durationSeconds,
                 intervalDays = recurrence.interval ?: 1,
                 expansionZone = expansionZone,
                 windowStartInstant = windowStartInstant,
                 windowEndInstant = windowEndInstant,
+                untilInstant = untilInstant,
+                maxCount = maxCount,
             )
-            isSimpleInfiniteWeekly(recurrence) -> {
+            isSimpleWeekly(recurrence) -> {
                 val byDays = recurrence.byDay.mapNotNull { bd ->
                     bd.day?.let { runCatching { DayOfWeek.valueOf(it.name) }.getOrNull() }
                 }.toSet()
@@ -49,16 +56,17 @@ internal object FastWindowExpansion {
                     expansionZone = expansionZone,
                     windowStartInstant = windowStartInstant,
                     windowEndInstant = windowEndInstant,
+                    untilInstant = untilInstant,
+                    maxCount = maxCount,
                 )
             }
             else -> null
         }
     }
 
-    // plain daily, no by* parts and no count/until
-    fun isSimpleInfiniteDaily(recurrence: Recurrence): Boolean {
+    // plain daily, no by* parts; COUNT/UNTIL are allowed and applied as bounds by the generator
+    fun isSimpleDaily(recurrence: Recurrence): Boolean {
         if (recurrence.frequency != Frequency.DAILY) return false
-        if (recurrence.count != null || recurrence.until != null) return false
         return recurrence.byDay.isEmpty() && recurrence.byMonth.isEmpty() &&
             recurrence.byMonthDay.isEmpty() && recurrence.byYearDay.isEmpty() &&
             recurrence.byWeekNo.isEmpty() && recurrence.bySetPos.isEmpty() &&
@@ -66,10 +74,9 @@ internal object FastWindowExpansion {
             recurrence.bySecond.isEmpty()
     }
 
-    // plain weekly on a weekday list, no ordinals/count/until/other by* parts
-    fun isSimpleInfiniteWeekly(recurrence: Recurrence): Boolean {
+    // plain weekly on a weekday list, no ordinals/other by* parts; COUNT/UNTIL applied as bounds by the generator
+    fun isSimpleWeekly(recurrence: Recurrence): Boolean {
         if (recurrence.frequency != Frequency.WEEKLY) return false
-        if (recurrence.count != null || recurrence.until != null) return false
         if (recurrence.byDay.isEmpty() || recurrence.byDay.any { it.num != null }) return false
         return recurrence.byMonth.isEmpty() && recurrence.byMonthDay.isEmpty() &&
             recurrence.byYearDay.isEmpty() && recurrence.byWeekNo.isEmpty() &&
