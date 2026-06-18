@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.OneShotPreDrawListener
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -913,11 +914,23 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     if (!loggedDisplayForRequest) {
                         loggedDisplayForRequest = true
                         val requestNanos = eventsRequestNanos
-                        val dataMs = (System.nanoTime() - requestNanos) / 1_000_000
-                        Timber.d("week view: ${incoming.size} events ready in ${dataMs}ms ($currentFromDate..$currentToDate)")
-                        binding.weekView.post {
-                            val frameMs = (System.nanoTime() - requestNanos) / 1_000_000
-                            Timber.d("week view: rendered ~${frameMs}ms after request ($currentFromDate..$currentToDate)")
+                        val dataReadyNanos = System.nanoTime()
+                        val dataMs = (dataReadyNanos - requestNanos) / 1_000_000
+                        val from = currentFromDate
+                        val to = currentToDate
+                        Timber.d("week view: ${incoming.size} events ready in ${dataMs}ms ($from..$to)")
+                        // pre-draw runs inside the draw traversal; the nested post then runs after that
+                        // traversal's onDraw (the chip rendering) completes, so renderMs covers the actual draw
+                        OneShotPreDrawListener.add(binding.weekView) {
+                            binding.weekView.post {
+                                val now = System.nanoTime()
+                                val renderMs = (now - dataReadyNanos) / 1_000_000
+                                val sinceRequestMs = (now - requestNanos) / 1_000_000
+                                Timber.d(
+                                    "week view: rendered in ${renderMs}ms (data->frame), " +
+                                        "${sinceRequestMs}ms since request ($from..$to)"
+                                )
+                            }
                         }
                     }
                     binding.weekView.showLoadingEvents = incoming.isEmpty() && events.fullyLoaded.not()
