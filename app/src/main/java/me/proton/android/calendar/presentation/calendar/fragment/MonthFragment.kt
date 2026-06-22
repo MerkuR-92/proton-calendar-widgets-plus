@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.OneShotPreDrawListener
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -105,7 +104,6 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -811,10 +809,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
     }
 
-    // basic display-latency timing from range request to events on screen
-    private var eventsRequestNanos = 0L
-    private var loggedDisplayForRequest = true
-
     private val rawUiEvents = MutableStateFlow<List<UiEvent>?>(null)
     private val weekViewEvents = rawUiEvents.filterNotNull().map { events ->
         events.flatMap { event ->
@@ -878,8 +872,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         currentFromDate = fromDate
         currentToDate = toDate
         currentTimeZoneId = timeZoneId
-        eventsRequestNanos = System.nanoTime()
-        loggedDisplayForRequest = false
         currentRange.update { EventsWindow(fromDate, toDate, timeZoneId) }
     }
 
@@ -911,28 +903,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     binding.weekView.showLoadingEvents = incoming.none { !it.isSkeleton }
                     binding.calendarProgress.isVisible = !hasRealEventsOnScreen
                 } else {
-                    if (!loggedDisplayForRequest) {
-                        loggedDisplayForRequest = true
-                        val requestNanos = eventsRequestNanos
-                        val dataReadyNanos = System.nanoTime()
-                        val dataMs = (dataReadyNanos - requestNanos) / 1_000_000
-                        val from = currentFromDate
-                        val to = currentToDate
-                        Timber.d("week view: ${incoming.size} events ready in ${dataMs}ms ($from..$to)")
-                        // pre-draw runs inside the draw traversal; the nested post then runs after that
-                        // traversal's onDraw (the chip rendering) completes, so renderMs covers the actual draw
-                        OneShotPreDrawListener.add(binding.weekView) {
-                            binding.weekView.post {
-                                val now = System.nanoTime()
-                                val renderMs = (now - dataReadyNanos) / 1_000_000
-                                val sinceRequestMs = (now - requestNanos) / 1_000_000
-                                Timber.d(
-                                    "week view: rendered in ${renderMs}ms (data->frame), " +
-                                        "${sinceRequestMs}ms since request ($from..$to)"
-                                )
-                            }
-                        }
-                    }
                     binding.weekView.showLoadingEvents = incoming.isEmpty() && events.fullyLoaded.not()
                     binding.calendarProgress.isVisible = events.fullyLoaded.not()
                 }

@@ -22,9 +22,4 @@ interface EventDecryptor {
 
     suspend fun getFromCache(eventId: String, calendarId: String, modifyTime: Long): Event?
 
-    // process-wide decryption counters for diagnosing in-memory cache usage
-    fun decryptionStats(): DecryptionStats
-
-    data class DecryptionStats(val cryptoRuns: Int, val cacheServes: Int, val cacheSize: Int)
-
 }

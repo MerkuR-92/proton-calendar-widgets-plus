@@ -35,7 +35,6 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
 
         val startNanos = System.nanoTime()
         val selectedMetadatas = database.eventsMetadataDao().selectEventsMetadata()
-        logger.d("PostProcessEventsMetadata: start, ${selectedMetadatas.size} metadata to process")
         val eventEntitiesForAlarms = mutableListOf<EventEntity>()
         // counters instead of per-event logs to avoid bloating the log over the whole metadata set
         var fetchedCount = 0

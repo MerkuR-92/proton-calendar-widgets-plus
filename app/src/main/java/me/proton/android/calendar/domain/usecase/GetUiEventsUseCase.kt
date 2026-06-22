@@ -28,7 +28,6 @@ import me.proton.core.domain.entity.UserId
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -56,8 +55,6 @@ class GetUiEventsUseCase @Inject constructor(
         priority: DecryptionPriority = DecryptionPriority.Offscreen,
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> {
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
-        // set when the flow is collected to measure how long inputs take to arrive
-        val executeStartNanos = System.nanoTime()
         Timber.d("getUiEventsUseCase: $eventsWindow")
 
         // skip the skeleton for windows already loaded this session since its expansion is wasteful on re-views
@@ -105,19 +102,10 @@ class GetUiEventsUseCase @Inject constructor(
                     database.passphrasesDao().flowCountByCalendarIds(calendarIds)
                         .debounceExceptFirst(1.seconds)
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring, _ ->
-                    val inputsMs = (System.nanoTime() - executeStartNanos) / 1_000_000
-                    Timber.d("getUiEvents inputs $eventsWindow @${inputsMs}ms: nonRec=${nonRecurring.size} finRec=${finiteRecurring.size} infRec=${infiniteRecurring.size}")
                     withContext(Dispatchers.Default) {
                         // submit heavy work into a priority runner
-                        val submitNanos = System.nanoTime()
                         priorityRunner.submit(priority) {
                             val started = System.nanoTime()
-                            val queueMs = (started - submitNanos) / 1_000_000
-                            // local cache hits vs real decryptions for this pass
-                            val cacheHits = AtomicInteger(0)
-                            val decrypts = AtomicInteger(0)
-                            // process-wide decryptor delta for crypto runs vs cache serves
-                            val statsBefore = eventDecryptor.decryptionStats()
                             // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
                             // to filter out even more events here, before decryption takes place
 
@@ -150,21 +138,14 @@ class GetUiEventsUseCase @Inject constructor(
                                     .distinct()
                                     .toSet()
 
-                            val selByUidsStart = System.nanoTime()
                             val byUidMap = calendarsRepository.selectEventEntitiesByUids(neededUids)
-                            val selByUidsMs = (System.nanoTime() - selByUidsStart) / 1_000_000
 
                             suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? {
                                 val cached = eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
-                                val event = if (cached != null) {
-                                    cacheHits.incrementAndGet()
-                                    cached
-                                } else {
-                                    database.eventsDao().selectById(occ.eventId)?.let {
-                                        decrypts.incrementAndGet()
+                                val event = cached
+                                    ?: database.eventsDao().selectById(occ.eventId)?.let {
                                         eventDecryptor.decrypt(it)
                                     }
-                                }
                                 return event?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
                             }
 
@@ -208,7 +189,6 @@ class GetUiEventsUseCase @Inject constructor(
                                 return computed
                             }
 
-                            val nonRecStart = System.nanoTime()
                             val transformedNonRecurring =
                                 nonRecurring.parallelMap { occ ->
                                     fetchEventFor(occ)?.toUiEvent(
@@ -217,43 +197,25 @@ class GetUiEventsUseCase @Inject constructor(
                                         isFreeUser = userInfo.hasSubscriptionForMail.not()
                                     )
                                 }
-                            val nonRecMs = (System.nanoTime() - nonRecStart) / 1_000_000
 
-                            val finRecStart = System.nanoTime()
                             val transformedFiniteRecurring =
                                 finiteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
                                     expandWithCache(occ)
                                 }.flatten()
-                            val finRecMs = (System.nanoTime() - finRecStart) / 1_000_000
 
-                            val infRecStart = System.nanoTime()
                             val transformedInfiniteRecurring =
                                 filteredInfiniteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
                                     expandWithCache(occ)
                                 }.flatten()
-                            val infRecMs = (System.nanoTime() - infRecStart) / 1_000_000
 
-                            val sortStart = System.nanoTime()
                             val uiEvents =
                                 (transformedNonRecurring + transformedFiniteRecurring + transformedInfiniteRecurring)
                                     .distinct()
                                     // deterministic order (independend of db row order)
                                     .sortedWith(compareBy({ it.dateStart }, { it.id }, { it.occurrenceNumber }))
-                            val sortMs = (System.nanoTime() - sortStart) / 1_000_000
 
                             val elapsedMs = (System.nanoTime() - started) / 1_000_000
-                            val statsAfter = eventDecryptor.decryptionStats()
-                            val cryptoRuns = statsAfter.cryptoRuns - statsBefore.cryptoRuns
-                            val cacheServes = statsAfter.cacheServes - statsBefore.cacheServes
-                            // per-pass timing breakdown
-                            Timber.d(
-                                "getUiEvents timing $eventsWindow: total=${elapsedMs}ms queue=${queueMs}ms " +
-                                    "selByUids=${selByUidsMs}ms nonRec=${nonRecMs}ms/${nonRecurring.size} " +
-                                    "finRec=${finRecMs}ms/${finiteRecurring.size} " +
-                                    "infRec=${infRecMs}ms/${filteredInfiniteRecurring.size} sort=${sortMs}ms " +
-                                    "cacheHits=${cacheHits.get()} decrypts=${decrypts.get()} " +
-                                    "crypto=$cryptoRuns served=$cacheServes cacheSize=${statsAfter.cacheSize} ui=${uiEvents.size}"
-                            )
+                            Timber.d("getUiEvents $eventsWindow: total=${elapsedMs}ms ui=${uiEvents.size}")
 
                             // base events expected in this window but not rendered
                             val expectedEventIds = (
@@ -279,7 +241,6 @@ class GetUiEventsUseCase @Inject constructor(
 
         return flow {
             if (!skipSkeleton) {
-                val skeletonStart = System.nanoTime()
                 val skeleton = try {
                     skeletonCalculator.computeSkeletonUiEvents(userId.id, fromDate, toDate, timeZoneId)
                 } catch (e: CancellationException) {
@@ -288,8 +249,6 @@ class GetUiEventsUseCase @Inject constructor(
                     Timber.w(t, "skeleton calculator threw for $fromDate..$toDate")
                     emptyList()
                 }
-                val skeletonMs = (System.nanoTime() - skeletonStart) / 1_000_000
-                Timber.d("getUiEvents skeleton: ${skeleton.size} placeholders in ${skeletonMs}ms $eventsWindow")
                 emit(CalendarsRepository.GetEventsResult.Success(skeleton, fullyLoaded = false, isSkeleton = true))
             }
             emitAll(realFlow)

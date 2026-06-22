@@ -10,7 +10,6 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 class EventDecryptorImpl @Inject constructor(
@@ -27,10 +26,6 @@ class EventDecryptorImpl @Inject constructor(
 
     private val cache = ConcurrentHashMap<CacheKey, Event>()
     private val eventsMutex = Mutex()
-
-    // Diagnostics: distinguish real decryptions from cache serves to see if caching actually kicks in.
-    private val cryptoRunCount = AtomicInteger(0)
-    private val cacheServeCount = AtomicInteger(0)
 
     private val cachedCalendars = ConcurrentHashMap<String, Calendar>()
 
@@ -49,12 +44,10 @@ class EventDecryptorImpl @Inject constructor(
         val key = CacheKey(eventEntity.id, eventEntity.calendarId, eventEntity.modifyTime)
 
         cache.computeIfPresent(key) { _, ev ->
-            cacheServeCount.incrementAndGet()
             if (ev.calendar == cal) ev else Event.from(ev, calendar = cal)
         }?.let { return it }
 
         val dec = transformEventUseCase.execute(eventEntity) ?: return null
-        cryptoRunCount.incrementAndGet()
         return cache.putIfAbsent(key, dec) ?: dec
     }
 
@@ -80,14 +73,7 @@ class EventDecryptorImpl @Inject constructor(
         val key = CacheKey(eventId, calendarId, modifyTime)
         return cache.compute(key) { _, cur ->
             cur ?: return@compute null
-            cacheServeCount.incrementAndGet()
             if (cur.calendar == cal) cur else Event.from(cur, calendar = cal)
         }
     }
-
-    override fun decryptionStats() = EventDecryptor.DecryptionStats(
-        cryptoRuns = cryptoRunCount.get(),
-        cacheServes = cacheServeCount.get(),
-        cacheSize = cache.size,
-    )
 }
