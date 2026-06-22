@@ -958,9 +958,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         val uidSet = uids.toSet()
 
         // resolve uids via the indexed eventUid column then load events by id instead of the slow sharedEvents LIKE scan
-        val refs = database.eventOccurrencesDao().selectEventRefsByUids(uidSet)
-        val eventsById = database.eventsDao()
-            .selectByIdIn(refs.map { it.eventId }.toSet())
+        val refs = uidSet.chunked(SQL_IN_VARIABLE_BATCH).flatMap {
+            database.eventOccurrencesDao().selectEventRefsByUids(it.toSet())
+        }
+        val eventsById = refs.map { it.eventId }.toSet()
+            .chunked(SQL_IN_VARIABLE_BATCH)
+            .flatMap { database.eventsDao().selectByIdIn(it.toSet()) }
             .associateBy { it.id }
         val eventIdsByUid = refs.groupBy({ it.eventUid }, { it.eventId })
         val byUid = uidSet.associateWith { uid ->
@@ -1436,7 +1439,9 @@ private fun List<MemberEntity>.getUserMember(userAddresses: List<AddressEntity>)
 }
 
 // safe max chunk size
-private const val UID_LIKE_BATCH_SIZE = 400
+private const val UID_LIKE_SCAN_BATCH = 400
+
+private const val SQL_IN_VARIABLE_BATCH = 900
 
 // how a UID appears inside an event's sharedEvents tex
 private fun uidMarker(uid: String): String = "UID:" + formatUidForICal(uid)
@@ -1445,7 +1450,7 @@ internal suspend fun fetchUidCandidates(
     markers: List<String>,
     runQuery: suspend (SupportSQLiteQuery) -> List<EventEntity>,
 ): List<EventEntity> =
-    markers.chunked(UID_LIKE_BATCH_SIZE).flatMap { chunk ->
+    markers.chunked(UID_LIKE_SCAN_BATCH).flatMap { chunk ->
         val where = chunk.joinToString(" OR ") { "sharedEvents LIKE ?" }
         val args = chunk.map { "%$it%" }.toTypedArray()
         runQuery(SimpleSQLiteQuery("SELECT * FROM events WHERE $where", args))

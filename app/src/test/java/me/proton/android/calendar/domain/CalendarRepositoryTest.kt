@@ -32,6 +32,7 @@ import me.proton.android.calendar.data.api.AttendeesInfoResponse
 import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.EventOccurrencesDao
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -54,6 +55,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -629,6 +631,31 @@ internal class CalendarRepositoryTest {
             }
             .map { Triple(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
             .sortedBy { it.first }
+    }
+
+    @Test
+    fun `selectEventEntitiesByUids chunks large uid sets under the SQL variable limit`() = runBlocking {
+        val uids = (0 until 1000).map { "uid-$it" }
+
+        val refChunks = mutableListOf<Set<String>>()
+        coEvery { appDatabaseMock.eventOccurrencesDao().selectEventRefsByUids(any()) } coAnswers {
+            val chunk = firstArg<Set<String>>()
+            refChunks.add(chunk)
+            chunk.map { EventOccurrencesDao.EventUidRef(eventId = it, eventUid = it) }
+        }
+        val idChunks = mutableListOf<Set<String>>()
+        coEvery { appDatabaseMock.eventsDao().selectByIdIn(any()) } coAnswers {
+            val chunk = firstArg<Set<String>>()
+            idChunks.add(chunk)
+            chunk.map { createEventEntity(it) }
+        }
+
+        val result = getCalendarRepository().selectEventEntitiesByUids(uids)
+
+        assertThat(result.keys).isEqualTo(uids.toSet())
+        assertThat(refChunks.all { it.size <= 999 }).isTrue()
+        assertThat(idChunks.all { it.size <= 999 }).isTrue()
+        assertThat(refChunks.flatten().toSet()).isEqualTo(uids.toSet())
     }
 
     @Test
