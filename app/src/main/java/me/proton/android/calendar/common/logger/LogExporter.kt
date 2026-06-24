@@ -7,12 +7,17 @@ import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 object LogExporter {
 
     const val EXPORT_FILE_NAME = "calendar-logs.zip"
+
+    private const val LOGCAT_CUTOFF_SECONDS = 12 * 3600L
 
     fun logDir(context: Context): File = File(context.cacheDir, "calendar_logs")
 
@@ -55,18 +60,29 @@ object LogExporter {
 
     private fun dumpLogcat(exportDir: File): File? = runCatching {
         val out = File(exportDir, "logcat.txt")
-        val process = Runtime.getRuntime().exec(arrayOf("logcat", "-d", "-v", "time"))
-        process.inputStream.bufferedReader().use { reader ->
-            out.bufferedWriter().use { writer ->
-                reader.lineSequence().forEach { line ->
-                    if (!isNoisyLogcatLine(line)) writer.appendLine(line)
+        // --t cutoff bounds the dump to recent history so the buffer can't produce an excessively large file
+        val process = Runtime.getRuntime().exec(
+            arrayOf("logcat", "-d", "-v", "time", "*:V", "--t", logcatCutoffTimestamp())
+        )
+        try {
+            process.inputStream.bufferedReader().use { reader ->
+                out.bufferedWriter().use { writer ->
+                    reader.lineSequence().forEach { line ->
+                        if (!isNoisyLogcatLine(line)) writer.appendLine(line)
+                    }
                 }
             }
+            process.waitFor()
+        } finally {
+            process.destroy()
         }
-        process.waitFor()
-        process.destroy()
         out
     }.getOrNull()
+
+    private fun logcatCutoffTimestamp(): String =
+        DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.000")
+            .withZone(ZoneId.systemDefault())
+            .format(Instant.now().minusSeconds(LOGCAT_CUTOFF_SECONDS))
 
     private val logcatTagRegex = Regex("""\s[VDIWEF]/([^(]+)\(""")
 

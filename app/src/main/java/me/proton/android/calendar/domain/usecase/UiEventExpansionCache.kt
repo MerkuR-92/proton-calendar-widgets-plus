@@ -41,7 +41,10 @@ class UiEventExpansionCache @Inject constructor() {
         val timeZoneId: String,
     )
 
-    private val cache = LruCache<Key, List<UiEvent>>(MAX_EXPANSION_ENTRIES)
+    // bound by total cached UiEvents (not entry count) so a few large windows can't blow up memory
+    private val cache = object : LruCache<Key, List<UiEvent>>(MAX_CACHED_UI_EVENTS) {
+        override fun sizeOf(key: Key, value: List<UiEvent>): Int = value.size.coerceAtLeast(1)
+    }
     private val seenWindows = LruCache<WindowKey, Boolean>(MAX_SEEN_WINDOWS)
 
     fun get(key: Key): List<UiEvent>? = cache.get(key)
@@ -63,7 +66,7 @@ class UiEventExpansionCache @Inject constructor() {
     }
 
     private companion object {
-        const val MAX_EXPANSION_ENTRIES = 10_000
+        const val MAX_CACHED_UI_EVENTS = 5_000
         const val MAX_SEEN_WINDOWS = 200
     }
 }
