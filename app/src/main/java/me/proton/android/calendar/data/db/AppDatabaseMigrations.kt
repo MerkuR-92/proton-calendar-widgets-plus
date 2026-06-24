@@ -692,4 +692,14 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    // index eventUid for uid lookups using room's generated index name
+    val MIGRATION_82_83 = object : Migration(82, 83) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_events_occurrences_eventUid` " +
+                    "ON `$TABLE_EVENTS_OCCURRENCES` (`eventUid`)"
+            )
+        }
+    }
 }

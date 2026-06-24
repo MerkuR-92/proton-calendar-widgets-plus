@@ -11,6 +11,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
+import me.proton.android.calendar.common.logger.LogExportHelper
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -105,6 +108,8 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentSettingsBinding.inflate(inflater, container, false)
 
+    private val logExportHelper = LogExportHelper(this)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -112,6 +117,9 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 ProtonTheme {
+                    val logsExportEnabled by produceState(initialValue = false) {
+                        value = featureFlagViewModel.isLogsExportEnabled()
+                    }
                     Column {
                         AccountSettingsItem(
                             onClick = { findNavController().navigate(R.id.action_nav_settings_to_nav_account_settings) }
@@ -124,6 +132,16 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                                 )
                             }
                         )
+                        if (logsExportEnabled) {
+                            ProtonSettingsItem(
+                                name = getString(R.string.settings_share_logs),
+                                onClick = { logExportHelper.share() }
+                            )
+                            ProtonSettingsItem(
+                                name = getString(R.string.settings_save_logs),
+                                onClick = { logExportHelper.saveToDisk() }
+                            )
+                        }
                     }
                 }
             }

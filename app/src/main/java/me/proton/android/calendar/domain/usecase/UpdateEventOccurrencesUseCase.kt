@@ -89,6 +89,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
 
             val firstOccurrenceStartTime = occurrences?.firstOrNull()?.startDateTime?.toEpochSecond() ?: run {
                 logger.w("UpdateEventOccurrencesUseCase.execute() failed to get first occurrence, RRULE: ${eventEntityMetadata.rRule}")
+                logger.d("occurrences DROP: no first occurrence, rrule=${eventEntityMetadata.rRule}")
                 return
             }
 
@@ -139,6 +140,9 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                 }
             }
             eventOccurrenceEntities
+        }
+        if (eventOccurrenceEntities.isEmpty()) {
+            logger.d("occurrences gen=0 rrule=${eventEntityMetadata.rRule}")
         }
         insertEventOccurrencesUseCase.execute(userId, eventEntityMetadata, eventOccurrenceEntities)
     }

@@ -33,8 +33,12 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
         val userId =
             accountManager.getPrimaryUserId().firstOrNull() ?: return UseCase.Result.Error("Could not obtain UserId")
 
+        val startNanos = System.nanoTime()
         val selectedMetadatas = database.eventsMetadataDao().selectEventsMetadata()
         val eventEntitiesForAlarms = mutableListOf<EventEntity>()
+        // counters instead of per-event logs to avoid bloating the log over the whole metadata set
+        var fetchedCount = 0
+        var skippedCount = 0
 
         selectedMetadatas.forEach { metadata ->
             if (calendarsRepository.shouldFetchEvent(userId, metadata)) {
@@ -47,11 +51,12 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
                     )
                 }
                 fetchedEventEntity?.let { entity ->
+                    fetchedCount++
                     eventEntitiesForAlarms.add(entity)
                     calendarsRepository.persistEvents(entity)
                 }
             } else {
-                logger.i("Ignoring fetch for event ${metadata.id}")
+                skippedCount++
             }
             try {
                 updateEventOccurrencesUseCase.execute(userId.id, metadata)
@@ -66,6 +71,8 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
         updateAlarmsUseCase.execute(userId.id, eventEntitiesForAlarms).ifSuccessAndLogErrors(logger) {}
         widgetRefresher.refreshEventList()
 
+        val tookMs = (System.nanoTime() - startNanos) / 1_000_000
+        logger.d("PostProcessEventsMetadata: done ${selectedMetadatas.size} metadata (fetched=$fetchedCount skipped=$skippedCount) in ${tookMs}ms")
         return UseCase.Result.Success<Unit>()
     }
 

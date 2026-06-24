@@ -197,6 +197,10 @@ class FeatureFlagViewModel @Inject constructor(
         return isFeatureEnabled(CalendarFeatureFlag.AddAttendeesToImportedEventsAndroid)
     }
 
+    suspend fun isLogsExportEnabled(): Boolean {
+        return isFeatureEnabled(CalendarFeatureFlag.LogsExport)
+    }
+
     suspend fun reportPlayStoreRatingFlowStarted() {
         updateFeatureFlag(CalendarFeatureFlag.RatingAndroidCalendar, false)
     }

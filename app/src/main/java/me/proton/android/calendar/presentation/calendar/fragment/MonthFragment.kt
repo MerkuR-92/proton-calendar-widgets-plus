@@ -40,6 +40,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -434,6 +436,11 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 ViewMode.WEEK -> binding.weekView.numberOfVisibleDays = WEEK_VIEW_DAYS_COUNT
                 else -> {}
             }
+            // hide the week/day loader so it never lingers over month/agenda
+            if (viewMode != ViewMode.WEEK && viewMode != ViewMode.DAY && viewMode != ViewMode.THREE_DAY) {
+                binding.calendarProgress.isVisible = false
+                binding.weekView.showLoadingEvents = false
+            }
             binding.fragmentMonthLayout.viewMode = viewMode
             initAgendaPager(viewMode)
         }
@@ -670,33 +677,41 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             buttonSearch.visibleOrGone(eventSearchFeatureFlag)
         }
 
+        // view-scoped state flow so a brief background-foreground transition doesn't rebuild the pipeline and re-show the spinner
+        val uiEventsState = combine(
+            calendarViewModel.viewMode.asFlow(),
+            currentRange,
+        ) { mode, range -> mode to range }
+            .filter { (mode, range) ->
+                // skip when the week view body is hidden
+                range != null && (
+                    mode == ViewMode.WEEK ||
+                    mode == ViewMode.DAY ||
+                    mode == ViewMode.THREE_DAY
+                )
+            }
+            .map { (_, range) -> range!! }
+            .distinctUntilChanged()
+            .flatMapLatest { range ->
+                calendarViewModel.getUiEventsLookupFlow(
+                    range.fromDate,
+                    range.toDate,
+                    range.timeZoneId,
+                    priority = DecryptionPriority.Visible,
+                )
+            }
+            .stateIn(
+                scope = viewLifecycleOwner.lifecycleScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                // null rather than InProgress so non-week modes don't get a stuck progress bar
+                initialValue = null,
+            )
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                combine(
-                    calendarViewModel.viewMode.asFlow(),
-                    currentRange,
-                ) { mode, range -> mode to range }
-                    .filter { (mode, range) ->
-                        // skip when the week view body is hidden
-                        range != null && (
-                            mode == ViewMode.WEEK ||
-                            mode == ViewMode.DAY ||
-                            mode == ViewMode.THREE_DAY
-                        )
-                    }
-                    .map { (_, range) -> range!! }
-                    .distinctUntilChanged()
-                    .flatMapLatest { range ->
-                        calendarViewModel.getUiEventsLookupFlow(
-                            range.fromDate,
-                            range.toDate,
-                            range.timeZoneId,
-                            priority = DecryptionPriority.Visible,
-                        )
-                    }
-                    .collectLatest {
-                        updateUiEvents(it)
-                    }
+                uiEventsState.collectLatest { result ->
+                    result?.let { updateUiEvents(it) }
+                }
             }
         }
         lifecycleScope.launch {
@@ -861,10 +876,12 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     }
 
     private fun updateUiEvents(events: CalendarsRepository.GetEventsResult<UiEvent>) {
+        // don't surface loading ui over events already on screen to avoid flicker on re-subscription
+        val hasRealEventsOnScreen = rawUiEvents.value?.any { !it.isSkeleton } == true
         when (events) {
             CalendarsRepository.GetEventsResult.InProgress -> {
-                binding.weekView.showLoadingEvents = true
-                binding.calendarProgress.isVisible = true
+                binding.weekView.showLoadingEvents = !hasRealEventsOnScreen
+                binding.calendarProgress.isVisible = !hasRealEventsOnScreen
             }
 
             is CalendarsRepository.GetEventsResult.Success -> {
@@ -881,8 +898,14 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 }
                 rawUiEvents.value = incoming
 
-                binding.weekView.showLoadingEvents = incoming.isEmpty() && events.fullyLoaded.not()
-                binding.calendarProgress.isVisible = events.fullyLoaded.not()
+                if (events.isSkeleton) {
+                    // skeleton placeholders only show loading ui when nothing real is on screen yet
+                    binding.weekView.showLoadingEvents = incoming.none { !it.isSkeleton }
+                    binding.calendarProgress.isVisible = !hasRealEventsOnScreen
+                } else {
+                    binding.weekView.showLoadingEvents = incoming.isEmpty() && events.fullyLoaded.not()
+                    binding.calendarProgress.isVisible = events.fullyLoaded.not()
+                }
             }
 
             is CalendarsRepository.GetEventsResult.Exception -> {

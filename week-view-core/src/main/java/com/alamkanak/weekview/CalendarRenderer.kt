@@ -52,67 +52,31 @@ private class SingleEventsUpdater(
 
     private val boundsCalculator = EventChipBoundsCalculator(viewState)
     private val textFitter = TextFitter(viewState)
-
-    private data class SceneParams(
-        val minHour: Int,
-        val maxHour: Int,
-        val hourHeight: Float,
-        val headerHeight: Float,
-        val dayWidth: Float,
-        val isSingleDay: Boolean,
-        val singleDayPadding: Int,
-        val dateRangeSize: Int,
-    )
-
-    private var lastScene: SceneParams? = null
-    private var lastOriginX: Float? = null
-    private var lastOriginY: Float? = null
-    private var previousDateRange: List<Long>? = null
-    private var lastCacheGeneration: Long = -1
-    private var offsetFrameCount: Int = 0
+    private val tracker = SingleEventsUpdateTracker()
 
     override fun update() {
         val cache = chipsCacheProvider() ?: return
 
-        val sceneNow = currentSceneParams()
-        val ox = viewState.currentOrigin.x
-        val oy = viewState.currentOrigin.y
-        val prevScene = lastScene
-        val prevOx = lastOriginX
-        val prevOy = lastOriginY
+        val update = tracker.decide(
+            scene = currentScene(),
+            originX = viewState.currentOrigin.x,
+            originY = viewState.currentOrigin.y,
+            dateRange = viewState.dateRange.map { it.atStartOfDay.timeInMillis },
+            cacheGeneration = cache.generation,
+        )
 
-        val sceneChanged = prevScene == null || prevScene != sceneNow
-        val dateRangeChanged = didDateRangeChange()
-        val cacheChanged = cache.generation != lastCacheGeneration
-
-        if (sceneChanged || dateRangeChanged || cacheChanged) {
-            if (cacheChanged) pruneStaleLabels(cache)
-            fullRecompute(cache)
-            offsetFrameCount = 0
-        } else if (prevOx != null && prevOy != null) {
-            val dx = ox - prevOx
-            val dy = oy - prevOy
-            if (dx != 0f || dy != 0f) {
-                if (offsetFrameCount < REANCHOR_INTERVAL) {
-                    offsetVisibleChips(cache, dx, dy)
-                    offsetFrameCount++
-                } else {
-                    fullRecompute(cache)
-                    offsetFrameCount = 0
-                }
+        when (update) {
+            is SingleEventsUpdate.Recompute -> {
+                if (update.cacheChanged) pruneStaleLabels(cache)
+                fullRecompute(cache, update.staleDateMillis)
             }
-            // else: no movement, no work needed
+            is SingleEventsUpdate.Offset -> offsetVisibleChips(cache, update.dx, update.dy)
+            SingleEventsUpdate.NoChange -> Unit
         }
-
-        lastScene = sceneNow
-        lastOriginX = ox
-        lastOriginY = oy
-        lastCacheGeneration = cache.generation
-        previousDateRange = viewState.dateRange.map { it.atStartOfDay.timeInMillis }
     }
 
-    private fun fullRecompute(cache: EventChipsCache) {
-        cleanupStaleChips(cache)
+    private fun fullRecompute(cache: EventChipsCache, staleDateMillis: List<Long>) {
+        cleanupStaleChips(cache, staleDateMillis)
 
         val grid = viewState.calendarGridBounds
         val prefetchRight = grid.right + viewState.dayWidth
@@ -156,16 +120,11 @@ private class SingleEventsUpdater(
         }
     }
 
-    private fun cleanupStaleChips(cache: EventChipsCache) {
-        val prev = previousDateRange ?: return
-        val currentMillis = viewState.dateRange.map { it.atStartOfDay.timeInMillis }.toSet()
-
-        for (dateMillis in prev) {
-            if (dateMillis !in currentMillis) {
-                for (chip in cache.normalEventChipsByDate(dateMillis)) {
-                    chip.setEmpty()
-                    eventLabels.remove(chip.id)
-                }
+    private fun cleanupStaleChips(cache: EventChipsCache, staleDateMillis: List<Long>) {
+        for (dateMillis in staleDateMillis) {
+            for (chip in cache.normalEventChipsByDate(dateMillis)) {
+                chip.setEmpty()
+                eventLabels.remove(chip.id)
             }
         }
     }
@@ -209,17 +168,7 @@ private class SingleEventsUpdater(
         }
     }
 
-    private fun didDateRangeChange(): Boolean {
-        val prev = previousDateRange ?: return true
-        val current = viewState.dateRange
-        if (prev.size != current.size) return true
-        for (i in prev.indices) {
-            if (prev[i] != current[i].atStartOfDay.timeInMillis) return true
-        }
-        return false
-    }
-
-    private fun currentSceneParams() = SceneParams(
+    private fun currentScene() = SingleEventsScene(
         minHour = viewState.minHour,
         maxHour = viewState.maxHour,
         hourHeight = viewState.hourHeight,
@@ -229,10 +178,6 @@ private class SingleEventsUpdater(
         singleDayPadding = viewState.singleDayHorizontalPadding,
         dateRangeSize = viewState.dateRange.size,
     )
-
-    companion object {
-        private const val REANCHOR_INTERVAL = 120
-    }
 }
 
 private class DayBackgroundDrawer(

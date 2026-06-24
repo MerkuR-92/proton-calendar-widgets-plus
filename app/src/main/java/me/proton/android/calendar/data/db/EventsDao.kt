@@ -24,8 +24,8 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId")
     abstract suspend fun selectEvent(eventId: String, calendarId: String): EventEntity?
 
-    @Query("SELECT * FROM events WHERE id IN (:uids)")
-    abstract suspend fun selectByUidIn(uids: Set<String>): List<EventEntity>
+    @Query("SELECT * FROM events WHERE id IN (:ids)")
+    abstract suspend fun selectByIdIn(ids: Set<String>): List<EventEntity>
 
     @RawQuery
     abstract suspend fun selectEventsMatchingRaw(query: SupportSQLiteQuery): List<EventEntity>

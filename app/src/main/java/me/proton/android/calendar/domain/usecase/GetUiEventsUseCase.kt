@@ -43,6 +43,7 @@ class GetUiEventsUseCase @Inject constructor(
     private val loadingStateUseCase: LoadingStateUseCase,
     private val priorityRunner: PriorityDecryptionRunner,
     private val skeletonCalculator: MetadataIndicatorsCalculator,
+    private val expansionCache: UiEventExpansionCache,
 ) : UseCase {
 
     fun execute(
@@ -55,6 +56,10 @@ class GetUiEventsUseCase @Inject constructor(
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> {
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
         Timber.d("getUiEventsUseCase: $eventsWindow")
+
+        // skip the skeleton for windows already loaded this session since its expansion is wasteful on re-views
+        val windowKey = UiEventExpansionCache.WindowKey(userId.id, fromDate, toDate, timeZoneId)
+        val skipSkeleton = expansionCache.hasSeenWindow(windowKey)
 
         val zoneId = ZoneId.of(timeZoneId)
         val fromEpochZdt = fromDate.atStartOfDay(zoneId)
@@ -69,6 +74,7 @@ class GetUiEventsUseCase @Inject constructor(
             .debounceExceptFirst(1.seconds)
             .flatMapLatest { calendars ->
                 val calendarIds = calendars.map { it.id }
+                val calendarColorById = calendars.associate { it.id to it.color }
                 combine(
                     getUserInfoUseCase().debounceExceptFirst(1.seconds).distinctUntilChanged(),
                     // trivial case, only 1 row for each event, start + end times are well defined
@@ -96,10 +102,10 @@ class GetUiEventsUseCase @Inject constructor(
                     database.passphrasesDao().flowCountByCalendarIds(calendarIds)
                         .debounceExceptFirst(1.seconds)
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring, _ ->
-                    Timber.d("for $eventsWindow nonRecurring: ${nonRecurring.size}, finiteRecurring: ${finiteRecurring.size}, infiniteRecurring: ${infiniteRecurring.size}")
                     withContext(Dispatchers.Default) {
                         // submit heavy work into a priority runner
                         priorityRunner.submit(priority) {
+                            val started = System.nanoTime()
                             // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
                             // to filter out even more events here, before decryption takes place
 
@@ -134,10 +140,54 @@ class GetUiEventsUseCase @Inject constructor(
 
                             val byUidMap = calendarsRepository.selectEventEntitiesByUids(neededUids)
 
-                            suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? =
-                                (eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
-                                    ?: database.eventsDao().selectById(occ.eventId)?.let { eventDecryptor.decrypt(it) })
-                                    ?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                            suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? {
+                                val cached = eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
+                                val event = cached
+                                    ?: database.eventsDao().selectById(occ.eventId)?.let {
+                                        eventDecryptor.decrypt(it)
+                                    }
+                                return event?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                            }
+
+                            val isFreeUser = userInfo.hasSubscriptionForMail.not()
+                            val userEmailsHash = userInfo.emails.hashCode()
+
+                            // cache expanded ui events since expansion dominates warm re-views and isn't covered by the decrypt cache
+                            suspend fun expandWithCache(occ: EventOccurrenceEntity): List<UiEvent>? {
+                                val siblingEntities = byUidMap[occ.eventUid].orEmpty()
+                                val calendarColor = calendarColorById[occ.calendarId]
+                                val key = if (calendarColor != null) UiEventExpansionCache.Key(
+                                    originalEventId = occ.eventId,
+                                    originalCalendarId = occ.calendarId,
+                                    originalModifyTime = occ.modifyTime,
+                                    calendarColor = calendarColor,
+                                    siblings = siblingEntities
+                                        .map { UiEventExpansionCache.SiblingId(it.id, it.modifyTime) }
+                                        .sortedBy { it.eventId },
+                                    fromDate = eventsWindow.fromDate,
+                                    toDate = eventsWindow.toDate,
+                                    timeZoneId = eventsWindow.timeZoneId,
+                                    userEmailsHash = userEmailsHash,
+                                    isFreeUser = isFreeUser,
+                                ) else null
+
+                                if (key != null) expansionCache.get(key)?.let { return it }
+
+                                val decr = fetchEventFor(occ) ?: return null
+                                val siblings = siblingEntities.mapNotNull { eventDecryptor.decrypt(it) }
+                                val computed = calendarsRepository
+                                    .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+                                        originalEvent = decr,
+                                        eventsSharingUid = siblings,
+                                        fromDate = eventsWindow.fromDate,
+                                        toDate = eventsWindow.toDate,
+                                        timeZoneId = eventsWindow.timeZoneId,
+                                        userEmails = userInfo.emails,
+                                        isFreeUser = isFreeUser,
+                                    ) ?: return null
+                                if (key != null) expansionCache.put(key, computed)
+                                return computed
+                            }
 
                             val transformedNonRecurring =
                                 nonRecurring.parallelMap { occ ->
@@ -150,66 +200,57 @@ class GetUiEventsUseCase @Inject constructor(
 
                             val transformedFiniteRecurring =
                                 finiteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
-                                    fetchEventFor(occ)?.let { decr ->
-                                        val eventsSharingUid = byUidMap[occ.eventUid]?.mapNotNull {
-                                            eventDecryptor.decrypt(it)
-                                        }.orEmpty()
-
-                                        calendarsRepository
-                                            .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-                                                originalEvent = decr,
-                                                eventsSharingUid = eventsSharingUid,
-                                                fromDate = eventsWindow.fromDate,
-                                                toDate = eventsWindow.toDate,
-                                                timeZoneId = eventsWindow.timeZoneId,
-                                                userEmails = userInfo.emails,
-                                                isFreeUser = userInfo.hasSubscriptionForMail.not()
-                                            )
-                                    }
+                                    expandWithCache(occ)
                                 }.flatten()
 
                             val transformedInfiniteRecurring =
                                 filteredInfiniteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
-                                        fetchEventFor(occ)?.let { decr ->
-                                            val eventsSharingUid = byUidMap[occ.eventUid]?.mapNotNull {
-                                                eventDecryptor.decrypt(it)
-                                            }.orEmpty()
+                                    expandWithCache(occ)
+                                }.flatten()
 
-                                            calendarsRepository
-                                                .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-                                                    originalEvent = decr,
-                                                    eventsSharingUid = eventsSharingUid,
-                                                    fromDate = eventsWindow.fromDate,
-                                                    toDate = eventsWindow.toDate,
-                                                    timeZoneId = eventsWindow.timeZoneId,
-                                                    userEmails = userInfo.emails,
-                                                    isFreeUser = userInfo.hasSubscriptionForMail.not()
-                                                )
-                                        }
-                                    }.flatten()
-                           (transformedNonRecurring + transformedFiniteRecurring + transformedInfiniteRecurring)
+                            val uiEvents =
+                                (transformedNonRecurring + transformedFiniteRecurring + transformedInfiniteRecurring)
                                     .distinct()
                                     // deterministic order (independend of db row order)
                                     .sortedWith(compareBy({ it.dateStart }, { it.id }, { it.occurrenceNumber }))
+
+                            val elapsedMs = (System.nanoTime() - started) / 1_000_000
+                            Timber.d("getUiEvents $eventsWindow: total=${elapsedMs}ms ui=${uiEvents.size}")
+
+                            // base events expected in this window but not rendered
+                            val expectedEventIds = (
+                                nonRecurring.asSequence().map { it.eventId } +
+                                    finiteRecurring.asSequence().map { it.eventId } +
+                                    filteredInfiniteRecurring.asSequence().map { it.eventId }
+                                ).toSet()
+                            val missingEventIds = expectedEventIds - uiEvents.asSequence().map { it.id }.toSet()
+                            if (missingEventIds.isNotEmpty()) {
+                                Timber.d("getUiEvents missing: ${missingEventIds.size} of $eventsWindow")
+                            }
+                            uiEvents
                         }
                     }
                 }
             }
             .combine(loadingStateUseCase.invoke().map { it.inProgress() }
                 .distinctUntilChanged()) { events, inProgress ->
+                Timber.d("getUiEvents emit: ${events.size} ui-events for $fromDate..$toDate (fullyLoaded=${inProgress.not()})")
                 CalendarsRepository.GetEventsResult.Success(events, fullyLoaded = inProgress.not())
             }
+            .onEach { expansionCache.markWindowSeen(windowKey) }
 
         return flow {
-            val skeleton = try {
-                skeletonCalculator.computeSkeletonUiEvents(userId.id, fromDate, toDate, timeZoneId)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (t: Throwable) {
-                Timber.w(t, "skeleton calculator threw for $fromDate..$toDate")
-                emptyList()
+            if (!skipSkeleton) {
+                val skeleton = try {
+                    skeletonCalculator.computeSkeletonUiEvents(userId.id, fromDate, toDate, timeZoneId)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (t: Throwable) {
+                    Timber.w(t, "skeleton calculator threw for $fromDate..$toDate")
+                    emptyList()
+                }
+                emit(CalendarsRepository.GetEventsResult.Success(skeleton, fullyLoaded = false, isSkeleton = true))
             }
-            emit(CalendarsRepository.GetEventsResult.Success(skeleton, fullyLoaded = false, isSkeleton = true))
             emitAll(realFlow)
         }
     }

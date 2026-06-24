@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.common.DEFAULT_HOLIDAY_CALENDAR_COLOR
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
+import me.proton.android.calendar.domain.usecase.UiEventExpansionCache
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -62,6 +63,7 @@ class AccountViewModel @Inject constructor(
     private val widgetRefresher: WidgetRefresher,
     private val eventDecryptor: EventDecryptor,
     private val workManager: WorkManager,
+    private val expansionCache: UiEventExpansionCache,
 ) : ViewModel() {
 
     sealed class State {
@@ -156,6 +158,7 @@ class AccountViewModel @Inject constructor(
         calendarsRepository.deleteAllCalendars()
         calendarsRepository.shutdown()
         eventDecryptor.clearCache()
+        expansionCache.clear()
         valueStoreProvider.provideValueStore(userId.id).clearAll()
         widgetRefresher.broadcastRefresh()
     }

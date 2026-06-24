@@ -45,4 +45,10 @@ abstract class EventOccurrencesDao : BaseDao<EventOccurrenceEntity> {
     ): List<EventKey>
 
     data class EventKey(val eventId: String, val calendarId: String)
+
+    // resolve event ids for uids via the indexed eventUid column
+    @Query("SELECT DISTINCT eventId, eventUid FROM events_occurrences WHERE eventUid IN (:uids)")
+    abstract suspend fun selectEventRefsByUids(uids: Set<String>): List<EventUidRef>
+
+    data class EventUidRef(val eventId: String, val eventUid: String)
 }

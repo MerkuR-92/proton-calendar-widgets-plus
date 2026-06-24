@@ -14,6 +14,8 @@ import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.logger.LogExporter
+import me.proton.android.calendar.common.logger.LogFileTree
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.domain.Logger
@@ -65,6 +67,11 @@ class ProtonCalendarApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
+        // file logging is planted in all build types (incl. release) so testers can export logs
+        Timber.plant(LogFileTree(LogExporter.logDir(this)))
+        // cold-process-start marker, to tell process death from a warm-process cache miss in the logs
+        Timber.i("=== app process start ===")
 
         ShowNotificationUseCase.createNotificationChannels(this)
 

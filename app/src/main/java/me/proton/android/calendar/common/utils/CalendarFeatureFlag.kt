@@ -23,6 +23,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     RefreshButton(FeatureId("CalendarAndroidRefreshButton"), false, false),
     RefreshDeletions(FeatureId("CalendarAndroidRefreshDeletions"), false, false),
     AddAttendeesToImportedEventsAndroid(FeatureId("CalendarAndroidAddAttendeesToImportedEvents"), false, false),
+    LogsExport(FeatureId("CalendarAndroidLogsExport"), false, false),
 
     /** Local only flag (unknown to remote API) **/
     // Enabled

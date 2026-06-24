@@ -4,6 +4,7 @@ import android.util.Log
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import biweekly.property.RecurrenceId
 import io.mockk.clearAllMocks
@@ -24,12 +25,14 @@ import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.AttendeesInfoResponse
 import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.EventOccurrencesDao
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -52,6 +55,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -560,6 +564,100 @@ internal class CalendarRepositoryTest {
         assert(uiEvents.isEmpty())
     }
 
+    // pin the fast path output to biweekly's full generation for a years-old dtstart
+
+    @Test
+    fun `fast-path daily with old DTSTART matches biweekly oracle`() = runBlocking {
+        val tz = "UTC"
+        val from = LocalDate.of(2025, 9, 23)
+        val to = LocalDate.of(2025, 9, 25)
+        // dtstart over 10 years before the window so the old path would walk thousands of occurrences
+        val original = buildTimedInfiniteRecurringEvent(
+            id = "daily-old",
+            uid = "daily-old-uid",
+            start = "2015-03-10T09:00",
+            durationMinutes = 60,
+            rrule = "FREQ=DAILY",
+            tz = tz,
+        )
+
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            original, emptyList(), from, to, tz, emptyList(), false
+        )!!
+
+        assertThat(uiEvents.toTuples(tz)).isEqualTo(original.oracleTuples(from, to, tz))
+        assertThat(uiEvents).isNotEmpty()
+    }
+
+    @Test
+    fun `fast-path weekly on weekdays with old DTSTART matches biweekly oracle`() = runBlocking {
+        val tz = "Europe/Zurich"
+        val from = LocalDate.of(2025, 9, 22) // monday
+        val to = LocalDate.of(2025, 9, 28) // sunday
+        // 2018-01-01 is a monday so dtstart lands on a byday
+        val original = buildTimedInfiniteRecurringEvent(
+            id = "weekly-old",
+            uid = "weekly-old-uid",
+            start = "2018-01-01T08:30",
+            durationMinutes = 45,
+            rrule = "FREQ=WEEKLY;BYDAY=MO,WE,FR",
+            tz = tz,
+        )
+
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            original, emptyList(), from, to, tz, emptyList(), false
+        )!!
+
+        assertThat(uiEvents.toTuples(tz)).isEqualTo(original.oracleTuples(from, to, tz))
+        assertThat(uiEvents).isNotEmpty()
+    }
+
+    private fun List<me.proton.android.calendar.domain.model.UiEvent>.toTuples(tz: String) =
+        map { Triple(it.dateStart.toInstant(), it.dateEnd.toInstant(), it.occurrenceNumber) }
+            .sortedBy { it.first }
+
+    // biweekly's full generation trimmed by the same overlap predicate the repo applies
+    private fun Event.oracleTuples(from: LocalDate, to: LocalDate, tz: String) = run {
+        val zone = ZoneId.of(tz)
+        val fromInstant = from.atStartOfDay(zone).toInstant()
+        val toEndInstant = to.plusDays(1).atStartOfDay(zone).toInstant()
+        generateOccurrencesUntil(to, tz)!!
+            .filter { occ ->
+                val s = occ.startDateTime.toInstant()
+                val e = occ.endDateTime.toInstant()
+                e.isAfter(fromInstant) && s.isBefore(toEndInstant)
+            }
+            .map { Triple(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
+            .sortedBy { it.first }
+    }
+
+    @Test
+    fun `selectEventEntitiesByUids chunks large uid sets under the SQL variable limit`() = runBlocking {
+        val uids = (0 until 1000).map { "uid-$it" }
+
+        val refChunks = mutableListOf<Set<String>>()
+        coEvery { appDatabaseMock.eventOccurrencesDao().selectEventRefsByUids(any()) } coAnswers {
+            val chunk = firstArg<Set<String>>()
+            refChunks.add(chunk)
+            chunk.map { EventOccurrencesDao.EventUidRef(eventId = it, eventUid = it) }
+        }
+        val idChunks = mutableListOf<Set<String>>()
+        coEvery { appDatabaseMock.eventsDao().selectByIdIn(any()) } coAnswers {
+            val chunk = firstArg<Set<String>>()
+            idChunks.add(chunk)
+            chunk.map { createEventEntity(it) }
+        }
+
+        val result = getCalendarRepository().selectEventEntitiesByUids(uids)
+
+        assertThat(result.keys).isEqualTo(uids.toSet())
+        assertThat(refChunks.all { it.size <= 999 }).isTrue()
+        assertThat(idChunks.all { it.size <= 999 }).isTrue()
+        assertThat(refChunks.flatten().toSet()).isEqualTo(uids.toSet())
+    }
+
     @Test
     fun `single edit moved out of window leaves gap`() = runBlocking {
         // Given base with 3 occurrences from 23–25 and window == 24 only
@@ -815,6 +913,35 @@ internal class CalendarRepositoryTest {
             appendLine("DTSTART;TZID=$tz:${toIcsLocal(startLdt)}")
             appendLine("DTEND;TZID=$tz:${toIcsLocal(endLdt)}")
             appendLine("RRULE:FREQ=DAILY;COUNT=$count")
+            appendLine("SEQUENCE:0")
+            appendLine("STATUS:CONFIRMED")
+            appendLine("END:VEVENT")
+            appendLine("END:VCALENDAR")
+        }
+        val iCal = me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString(ics)!!
+        val base = Event.dummyFrom(iCal)!!
+        return Event.from(base, id = id)
+    }
+
+    fun buildTimedInfiniteRecurringEvent(
+        id: String,
+        uid: String,
+        start: String, // "2015-03-10T09:00"
+        durationMinutes: Int,
+        rrule: String, // infinite rrule, no count/until
+        tz: String,
+    ): Event {
+        val startLdt = parseIsoLocal(start)
+        val endLdt = startLdt.plusMinutes(durationMinutes.toLong())
+        val ics = buildString {
+            appendLine("BEGIN:VCALENDAR")
+            appendLine("VERSION:2.0")
+            appendLine("BEGIN:VEVENT")
+            appendLine("UID:$uid")
+            appendLine("DTSTAMP:20210101T000000Z")
+            appendLine("DTSTART;TZID=$tz:${toIcsLocal(startLdt)}")
+            appendLine("DTEND;TZID=$tz:${toIcsLocal(endLdt)}")
+            appendLine("RRULE:$rrule")
             appendLine("SEQUENCE:0")
             appendLine("STATUS:CONFIRMED")
             appendLine("END:VEVENT")

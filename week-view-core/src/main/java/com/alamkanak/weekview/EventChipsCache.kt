@@ -8,6 +8,8 @@ internal typealias EventChipsCacheProvider = () -> EventChipsCache?
 
 internal class EventChipsCache {
 
+    // written on the background events thread, read on the main (render) thread
+    @Volatile
     var generation: Long = 0
         private set
 

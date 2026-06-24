@@ -256,7 +256,6 @@ class ItemCalendarAgendaFragment: Fragment() {
             CalendarsRepository.GetEventsResult.InProgress -> {
                 val currentList = eventsListLayoutAdapter.currentList
                 if (currentList.size <= 1) {
-                    calendarViewModel.setLoading(true, position)
                     binding.listViewStatus.isVisible = true
                     binding.listViewStatus.text = resources.getString(R.string.agenda_loading_events)
                 }
@@ -304,7 +303,6 @@ class ItemCalendarAgendaFragment: Fragment() {
                     eventsListLayoutAdapter.submitList(
                         listOf(fakeHeaderEvent).plus(sortedEvents)
                     )
-                    calendarViewModel.setLoading(false, position)
                 }
             }
             is CalendarsRepository.GetEventsResult.Exception -> {
@@ -315,14 +313,12 @@ class ItemCalendarAgendaFragment: Fragment() {
                 eventsListLayoutAdapter.submitList(
                     listOf(fakeHeaderEvent)
                 )
-                calendarViewModel.setLoading(false, position)
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        calendarViewModel.setLoading(false, position)
         _binding = null
     }
 }

@@ -168,11 +168,15 @@ class TransformEventUseCase @Inject constructor(
 
         }
 
-        if (calendarParts.isEmpty()) return null
+        if (calendarParts.isEmpty()) {
+            return null
+        }
 
         val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)
 
-        if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) return null
+        if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) {
+            return null
+        }
 
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null

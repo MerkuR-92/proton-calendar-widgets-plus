@@ -182,8 +182,8 @@ class CalendarViewModel @Inject constructor(
     val visibleTopPagerPosition = MutableStateFlow(Int.MIN_VALUE)
     val visibleAgendaPagerPosition = MutableStateFlow(Int.MIN_VALUE)
 
-    var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
-    var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
+    // count of in-progress loads with loading true while any are active
+    private var loadingProcesses: Int = 0
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -782,22 +782,9 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    /**
-     * @param loading define the loading state
-     * @param position fragment position in the view pager
-     */
-    fun setLoading(loading: Boolean, position: Int? = null) {
-        if (loading) {
-            currentLoadingProcesses++
-            if (position != null) viewPagerFragmentsLoadingState[position] = true
-            this.loading.value = true
-        } else if (position != null) {
-            if (viewPagerFragmentsLoadingState[position] == true && currentLoadingProcesses > 0) currentLoadingProcesses--
-            viewPagerFragmentsLoadingState.remove(position)
-        } else {
-            if (currentLoadingProcesses > 0) currentLoadingProcesses--
-        }
-        if (currentLoadingProcesses == 0) this.loading.value = false
+    fun setLoading(loading: Boolean) {
+        if (loading) loadingProcesses++ else if (loadingProcesses > 0) loadingProcesses--
+        this.loading.value = loadingProcesses > 0
     }
 
     suspend fun isFreeUser(): Boolean? {
