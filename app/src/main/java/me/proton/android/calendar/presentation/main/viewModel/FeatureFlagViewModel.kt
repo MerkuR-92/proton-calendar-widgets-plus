@@ -193,6 +193,10 @@ class FeatureFlagViewModel @Inject constructor(
         return isFeatureEnabled(CalendarFeatureFlag.CalendarAndroidServerDownBanner)
     }
 
+    suspend fun isAddAttendeesToImportedEventsEnabled(): Boolean {
+        return isFeatureEnabled(CalendarFeatureFlag.AddAttendeesToImportedEventsAndroid)
+    }
+
     suspend fun reportPlayStoreRatingFlowStarted() {
         updateFeatureFlag(CalendarFeatureFlag.RatingAndroidCalendar, false)
     }
