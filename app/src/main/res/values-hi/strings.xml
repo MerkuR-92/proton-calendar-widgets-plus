@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">सदस्यता</string>
     <string name="nav_view_more_logout">साइन आउट</string>
     <string name="nav_view_more_login">साइन इन</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">यह सुविधा जल्द ही आ रही है</string>
     <string name="snack_event_deleted">कार्यक्रम मिटाया गया</string>

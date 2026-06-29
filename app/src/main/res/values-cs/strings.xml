@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">Předplatné</string>
     <string name="nav_view_more_logout">Odhlásit se</string>
     <string name="nav_view_more_login">Přihlásit se</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Tato funkce bude brzy k dispozici</string>
     <string name="snack_event_deleted">Událost smazána</string>

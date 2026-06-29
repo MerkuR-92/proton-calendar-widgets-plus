@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">გამოწერა</string>
     <string name="nav_view_more_logout">გასვლა</string>
     <string name="nav_view_more_login">შესვლა</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">ეს ფუნქცია მალე ჩაირთვება</string>
     <string name="snack_event_deleted">მოვლენა წაიშალა</string>

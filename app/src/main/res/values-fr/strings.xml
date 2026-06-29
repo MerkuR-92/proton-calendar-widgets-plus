@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">Abonnement</string>
     <string name="nav_view_more_logout">Se déconnecter</string>
     <string name="nav_view_more_login">Se connecter</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Cette fonctionnalité sera bientôt disponible.</string>
     <string name="snack_event_deleted">L\'événement a été supprimé.</string>
