@@ -28,6 +28,7 @@ import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.presentation.holidayCalendar.HolidayCalendarUtils
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
@@ -81,6 +82,9 @@ class HolidayCalendarViewModel @Inject constructor(
     private val _country = MutableLiveData("")
     val country: LiveData<String> = _country
 
+    private val _countryCode = MutableLiveData("")
+    val countryCode: LiveData<String> = _countryCode
+
     private val _calendarColor = MutableLiveData<String>()
     val calendarColor: LiveData<String> = _calendarColor
 
@@ -109,6 +113,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
     fun resetValues() {
         _country.value = ""
+        _countryCode.value = ""
         _language.value = ""
         _calendarColor.value = ""
         _defaultAllDayAlarms.value = arrayListOf()
@@ -155,7 +160,8 @@ class HolidayCalendarViewModel @Inject constructor(
                 return
             }
 
-            // Calendar name
+            // Calendar country
+            _countryCode.value = managedHolidayCalendar.countryCode
             _country.value = managedHolidayCalendar.country
 
             // Calendar language
@@ -259,6 +265,7 @@ class HolidayCalendarViewModel @Inject constructor(
         } ?: return false
         // Change state so we display based on time zone disclaimer
         holidayCalendarState.value = HolidayCalendarState.PickBasedOnTimeZone
+        _countryCode.value = matchingDefaultHolidayCalendar.countryCode
         _country.value = matchingDefaultHolidayCalendar.country
         _language.value = matchingDefaultHolidayCalendar.language
         return true
@@ -278,15 +285,15 @@ class HolidayCalendarViewModel @Inject constructor(
     }
 
     fun getLanguages(): List<String> {
-        val languages = _holidayCalendars.value?.filter {
-            it.country == _country.value && it.hidden == false
-        }?.map {
-            it.language
-        } ?: emptyList()
+        val visibleCalendars = _holidayCalendars.value?.filter { it.hidden == false }.orEmpty()
+        val languages = HolidayCalendarUtils.languagesForCountry(
+            calendars = visibleCalendars,
+            countryCode = _countryCode.value.orEmpty()
+        )
         return language.value?.let {
             // Add already selected language for cases where user edit hidden calendar
             languages.plus(it).distinct()
-        } ?: languages.distinct()
+        } ?: languages
     }
 
     fun hasBeenEdited(): Boolean {
@@ -319,9 +326,10 @@ class HolidayCalendarViewModel @Inject constructor(
         _defaultAllDayAlarms.value = tmpDefaultAllDayAlarms
     }
 
-    suspend fun handleCountry(country: String, defaultLanguageCode: String) {
-        if (_country.value == country) return
+    suspend fun handleCountry(country: String, countryCode: String, defaultLanguageCode: String) {
+        if (_countryCode.value == countryCode) return
         calendarEdited = true
+        _countryCode.value = countryCode
         _country.value = country
 
         if (holidayCalendarState.value == HolidayCalendarState.PickBasedOnTimeZone) {
@@ -330,10 +338,11 @@ class HolidayCalendarViewModel @Inject constructor(
         }
 
         // Get the calendar matching the default language
-        val matchingCountries = holidayCalendars.value?.filter { it.country == country }
-        val matchingDefaultHolidayCalendar = matchingCountries?.firstOrNull {
-            it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
-        } ?: matchingCountries?.firstOrNull()
+        val matchingDefaultHolidayCalendar = HolidayCalendarUtils.defaultCalendarForCountry(
+            calendars = holidayCalendars.value.orEmpty(),
+            countryCode = countryCode,
+            deviceLanguageCode = defaultLanguageCode
+        )
         _language.value = matchingDefaultHolidayCalendar?.language ?: ""
 
         checkExistingHolidayCalendar()
@@ -354,7 +363,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
     private suspend fun checkExistingHolidayCalendar() {
         val holidayCalendarId = holidayCalendars.value?.firstOrNull {
-            it.country == _country.value && it.language == _language.value
+            it.countryCode == _countryCode.value && it.language == _language.value
         }?.calendarId
         if (_calendar?.id == holidayCalendarId) {
             if (holidayCalendarState.value == HolidayCalendarState.AlreadyExists) {
@@ -382,7 +391,7 @@ class HolidayCalendarViewModel @Inject constructor(
         val userId = userId.value
 
         val holidayCalendar = holidayCalendars.value?.firstOrNull {
-            it.country == _country.value && it.language == _language.value
+            it.countryCode == _countryCode.value && it.language == _language.value
         }
 
         val calendarColor = _calendarColor.value
