@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">Συνδρομή</string>
     <string name="nav_view_more_logout">Αποσύνδεση</string>
     <string name="nav_view_more_login">Είσοδος</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Αυτή η δυνατότητα θα είναι διαθέσιμη σύντομα</string>
     <string name="snack_event_deleted">Η εκδήλωση διαγράφηκε</string>

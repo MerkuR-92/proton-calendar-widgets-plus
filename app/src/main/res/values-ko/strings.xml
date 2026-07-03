@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">구독</string>
     <string name="nav_view_more_logout">로그아웃</string>
     <string name="nav_view_more_login">로그인</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">이 기능은 곧 제공될 예정입니다</string>
     <string name="snack_event_deleted">이벤트 삭제됨</string>

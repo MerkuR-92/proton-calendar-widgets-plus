@@ -323,6 +323,7 @@
     <string name="nav_view_more_subscription">Naročnina</string>
     <string name="nav_view_more_logout">Odjava</string>
     <string name="nav_view_more_login">Prijava</string>
+    <!-- Debug log export (English-only, mirrors Proton Mail; not localized) -->
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Ta funkcija bo kmalu na voljo</string>
     <string name="snack_event_deleted">Izbrisan dogodek</string>
