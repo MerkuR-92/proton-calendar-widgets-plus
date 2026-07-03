@@ -2,12 +2,15 @@ package me.proton.android.calendar.common
 
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
+import kotlinx.serialization.json.JsonObject
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.contact.domain.entity.ContactEmailId
 import me.proton.core.contact.domain.entity.ContactId
 import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class ProtonUtilsImplTest {
@@ -89,6 +92,60 @@ class ProtonUtilsImplTest {
         assertEquals("attendee1", result[0].commonName)
         assertEquals("attendee1@proton.me", result[0].email)
     }
+
+    @Test
+    fun `getMatchingDefaultHolidayCalendar - without a locale match, picks the first calendar in the list, not the alphabetical one`() {
+        val zurich = "Europe/Zurich"
+        val calendars = listOf(
+            holidayCalendar(calendarId = "ch-fr", countryCode = "ch", languageCode = "fr", language = "Français", timezones = listOf(zurich)),
+            holidayCalendar(calendarId = "ch-de", countryCode = "ch", languageCode = "de", language = "Deutsch", timezones = listOf(zurich)),
+        )
+
+        val result = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
+            holidayCalendars = calendars,
+            primaryTimeZoneId = zurich,
+            defaultLanguageCode = "en",
+            defaultCountryCode = ""
+        )
+
+        assertEquals("ch-fr", result?.calendarId)
+    }
+
+    @Test
+    fun `getMatchingDefaultHolidayCalendar - several countries and no locale match returns no suggestion`() {
+        val sharedZone = "Europe/Brussels"
+        val calendars = listOf(
+            holidayCalendar(calendarId = "fr", countryCode = "fr", languageCode = "fr", language = "Français", timezones = listOf(sharedZone)),
+            holidayCalendar(calendarId = "de", countryCode = "de", languageCode = "de", language = "Deutsch", timezones = listOf(sharedZone)),
+        )
+
+        val result = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
+            holidayCalendars = calendars,
+            primaryTimeZoneId = sharedZone,
+            defaultLanguageCode = "en",
+            defaultCountryCode = ""
+        )
+
+        assertNull(result)
+    }
+
+    private fun holidayCalendar(
+        calendarId: String,
+        countryCode: String,
+        languageCode: String,
+        language: String,
+        timezones: List<String>,
+    ) = ManagedHolidayCalendarEntity(
+        calendarId = calendarId,
+        country = "Country",
+        countryCode = countryCode,
+        languageCode = languageCode,
+        language = language,
+        timezones = timezones,
+        passphrase = "",
+        sessionKey = JsonObject(emptyMap()),
+        hidden = false,
+    )
 
     private fun generateAttendeeList(): List<Attendee> {
         val attendee1 = Attendee(

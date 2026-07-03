@@ -27,6 +27,7 @@ import me.proton.android.calendar.databinding.FragmentHolidayCalendarFormBinding
 import me.proton.android.calendar.databinding.FragmentHolidayCalendarSearchBinding
 import me.proton.android.calendar.domain.model.Holiday
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.holidayCalendar.HolidayCalendarUtils
 import me.proton.android.calendar.presentation.holidayCalendar.adapter.HolidayCalendarListAdapter
 import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -102,7 +103,11 @@ class HolidayCalendarSearchFragment : BaseDialogFragment<FragmentHolidayCalendar
         binding.holidayCalendarCountryList.layoutManager = countryListLayoutManager
         holidayCalendarListAdapter = HolidayCalendarListAdapter {
             lifecycleScope.launch {
-                holidayCalendarViewModel.handleCountry(it.country, requireContext().resources.configuration.currentLocale().language.lowercase())
+                holidayCalendarViewModel.handleCountry(
+                    country = it.country,
+                    countryCode = it.countryCode,
+                    defaultLanguageCode = requireContext().resources.configuration.currentLocale().language.lowercase()
+                )
             }
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
@@ -127,34 +132,34 @@ class HolidayCalendarSearchFragment : BaseDialogFragment<FragmentHolidayCalendar
 
     @SuppressLint("DiscouragedApi") // Suppress annotation caused by getIdentifier to get flag drawables
     fun List<ManagedHolidayCalendarEntity>.toHolidayItems(primaryTimeZoneId: String): List<HolidayCalendarListAdapter.HolidayItem> {
+        val deviceLanguageCode = requireContext().resources.configuration.currentLocale().language.lowercase()
         val holidayItems = arrayListOf<HolidayCalendarListAdapter.HolidayItem>()
         var basedOnTimeZoneHeaderAdded = false
-        this.sortedBy { it.country }.groupBy { it.country }.forEach {
+        HolidayCalendarUtils.distinctCountries(calendars = this, deviceLanguageCode = deviceLanguageCode).forEach { calendar ->
             val header = HolidayCalendarListAdapter.HolidayItem.Header(
-                it.key.first().uppercase(),
+                calendar.country.first().uppercase(),
                 false
             )
             // Add first letter header
             if (!holidayItems.contains(header)) holidayItems.add(header)
-            val countryCode = it.value.first().countryCode
             val countryFlagDrawable = resources.getIdentifier(
-                "${requireContext().packageName}:drawable/flag_$countryCode",
+                "${requireContext().packageName}:drawable/flag_${calendar.countryCode}",
                 "drawable",
                 requireContext().packageName
             )
-            holidayItems.add(HolidayCalendarListAdapter.HolidayItem.Value(Holiday(it.key, countryFlagDrawable)))
+            holidayItems.add(HolidayCalendarListAdapter.HolidayItem.Value(Holiday(calendar.country, calendar.countryCode, countryFlagDrawable)))
 
-            if (it.value.first().timezones.contains(primaryTimeZoneId)) {
+            if (calendar.timezones.contains(primaryTimeZoneId)) {
                 // Add based on time zone item
                 if (!basedOnTimeZoneHeaderAdded) {
                     val basedOnTimeZoneHeaderHeader = HolidayCalendarListAdapter.HolidayItem.Header(
-                        it.key.first().uppercase(),
-                        it.value.first().timezones.contains(primaryTimeZoneId)
+                        calendar.country.first().uppercase(),
+                        true
                     )
                     holidayItems.add(0, basedOnTimeZoneHeaderHeader)
                     basedOnTimeZoneHeaderAdded = true
                 }
-                holidayItems.add(1, HolidayCalendarListAdapter.HolidayItem.Value(Holiday(it.key, countryFlagDrawable)))
+                holidayItems.add(1, HolidayCalendarListAdapter.HolidayItem.Value(Holiday(calendar.country, calendar.countryCode, countryFlagDrawable)))
             }
         }
         return holidayItems

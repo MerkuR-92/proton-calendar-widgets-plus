@@ -223,12 +223,15 @@ object ProtonUtilsImpl : ProtonUtils {
                 }
             } else calendarsMatchingTimeZone
 
-        // Get the calendar matching the default language
-        val matchingDefaultHolidayCalendar = calendarsMatchingCode.firstOrNull {
+        val languageMatch = calendarsMatchingCode.firstOrNull {
             it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
-        } ?: calendarsMatchingCode.minByOrNull { it.language }
-
-        return matchingDefaultHolidayCalendar
+        }
+        // Only suggest when the country is unambiguous: a language match, or a single country
+        return when {
+            languageMatch != null -> languageMatch
+            calendarsMatchingCode.map { it.countryCode }.distinct().size == 1 -> calendarsMatchingCode.firstOrNull()
+            else -> null
+        }
     }
 
     override fun matchAttendeesWithContacts(
