@@ -20,6 +20,10 @@ class LoadingStateUseCase @Inject constructor() : UseCase {
         }
     }
 
+    fun clear() {
+        state.update { LoadingState() }
+    }
+
     data class LoadingState(
         val fetchingMinimalCalendarEventsFor: Set<String> = emptySet(),
     ) {

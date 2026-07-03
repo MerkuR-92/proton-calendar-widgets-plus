@@ -32,38 +32,41 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
 
         loadingStateUseCase.markMinimalCalendarFetching(calendarId, inProgress = true)
 
-        val zoneId = if (timezone.isBlank()) ZoneId.systemDefault() else ZoneId.of(timezone)
-        val now = LocalDate.now(zoneId)
-        val weekStart = userSettingsRepository.getWeekStart(userId, database)
-        val timeWindow = getCachedMonthViewsTimeWindow(now, weekStart)
-        val fromDate = timeWindow.first
-        val toDate = timeWindow.second
+        // finally so cancellation mid-fetch (cancelAllWork on logout) still clears the marker
+        try {
+            val zoneId = if (timezone.isBlank()) ZoneId.systemDefault() else ZoneId.of(timezone)
+            val now = LocalDate.now(zoneId)
+            val weekStart = userSettingsRepository.getWeekStart(userId, database)
+            val timeWindow = getCachedMonthViewsTimeWindow(now, weekStart)
+            val fromDate = timeWindow.first
+            val toDate = timeWindow.second
 
-        val fetchStart = System.nanoTime()
-        val (result, entitiesAndMetadatas) = fetchEventsUseCase.splitFetchEvents(userId, listOf(calendarId), fromDate, toDate, zoneId.id)
-        val fetchMs = (System.nanoTime() - fetchStart) / 1_000_000
-        logger.d("GetMinimalCalendarEvents fetch: ${fetchMs}ms ok=${result is UseCase.Result.Success<*>} events=${entitiesAndMetadatas?.size ?: 0}")
-        result.logErrors(logger)
+            val fetchStart = System.nanoTime()
+            val (result, entitiesAndMetadatas) = fetchEventsUseCase.splitFetchEvents(userId, listOf(calendarId), fromDate, toDate, zoneId.id)
+            val fetchMs = (System.nanoTime() - fetchStart) / 1_000_000
+            logger.d("GetMinimalCalendarEvents fetch: ${fetchMs}ms ok=${result is UseCase.Result.Success<*>} events=${entitiesAndMetadatas?.size ?: 0}")
+            result.logErrors(logger)
 
-        if (result is UseCase.Result.Success<*>) {
-            if (entitiesAndMetadatas == null) {
-                logger.e("GetMinimalCalendarEventsUseCase: null event list when Success")
-                return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: null event list when Success")
+            if (result is UseCase.Result.Success<*>) {
+                if (entitiesAndMetadatas == null) {
+                    logger.e("GetMinimalCalendarEventsUseCase: null event list when Success")
+                    return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: null event list when Success")
+                }
+
+                logger.v("GetMinimalCalendarEventsUseCase fetchEventsResult success: ${entitiesAndMetadatas.size}")
+                val eventEntities = entitiesAndMetadatas.map { it.first }
+                calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
+                entitiesAndMetadatas.map { it.second }.forEach {
+                    updateEventOccurrencesUseCase.execute(userId.id, it)
+                }
+                updateAlarmsUseCase.execute(userId.id, eventEntities)
+                return UseCase.Result.Success<Unit>()
+            } else {
+                logger.e("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents: $result")
+                return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
             }
-
-            logger.v("GetMinimalCalendarEventsUseCase fetchEventsResult success: ${entitiesAndMetadatas.size}")
-            val eventEntities = entitiesAndMetadatas.map { it.first }
-            calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
-            entitiesAndMetadatas.map { it.second }.forEach {
-                updateEventOccurrencesUseCase.execute(userId.id, it)
-            }
-            updateAlarmsUseCase.execute(userId.id, eventEntities)
+        } finally {
             loadingStateUseCase.markMinimalCalendarFetching(calendarId, inProgress = false)
-            return UseCase.Result.Success<Unit>()
-        } else {
-            loadingStateUseCase.markMinimalCalendarFetching(calendarId, inProgress = false)
-            logger.e("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents: $result")
-            return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
         }
     }
 }
