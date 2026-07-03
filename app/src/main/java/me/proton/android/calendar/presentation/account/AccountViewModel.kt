@@ -27,6 +27,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.BootstrapAllCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.LoadingStateUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
@@ -64,6 +65,7 @@ class AccountViewModel @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val workManager: WorkManager,
     private val expansionCache: UiEventExpansionCache,
+    private val loadingStateUseCase: LoadingStateUseCase,
 ) : ViewModel() {
 
     sealed class State {
@@ -159,6 +161,7 @@ class AccountViewModel @Inject constructor(
         calendarsRepository.shutdown()
         eventDecryptor.clearCache()
         expansionCache.clear()
+        loadingStateUseCase.clear()
         valueStoreProvider.provideValueStore(userId.id).clearAll()
         widgetRefresher.broadcastRefresh()
     }

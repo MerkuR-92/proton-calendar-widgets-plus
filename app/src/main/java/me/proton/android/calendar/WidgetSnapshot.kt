@@ -12,6 +12,9 @@ import me.proton.core.util.kotlin.takeIfNotBlank
 import java.time.LocalDate
 import java.time.ZoneId
 
+// keeps the RemoteViews list within a single Binder transaction
+internal const val MAX_WIDGET_EVENTS = 100
+
 internal data class WidgetSnapshot(
     val events: List<WidgetEvent>,
     val statusText: String?,
@@ -30,12 +33,14 @@ internal fun List<UiEvent>.toWidgetSnapshot(
     this.explodeDayByDay(fromDate, toDate, zoneId.id)
         .toSortedMap()
         .forEach { entry ->
+            if (widgetEvents.size >= MAX_WIDGET_EVENTS) return@forEach
             val sorted = entry.value
                 .filter { !it.isInThePast() }
                 .distinctBy { it.id to it.occurrenceNumber }
                 .sortedBy { "${!it.isAllDay}${it.dateStart.toEpochSecond()}${it.summary}" }
 
             sorted.forEachIndexed { index, e ->
+                if (widgetEvents.size >= MAX_WIDGET_EVENTS) return@forEachIndexed
                 widgetEvents.add(
                     e.toWidgetEvent(
                         resourceProvider = resourceProvider,
@@ -62,6 +67,9 @@ internal fun List<UiEvent>.toWidgetSnapshot(
             )
         )
     }
+
+    if (widgetEvents.size > MAX_WIDGET_EVENTS) widgetEvents.subList(MAX_WIDGET_EVENTS, widgetEvents.size).clear()
+
     widgetEvents.removeLastOrNull()?.let { widgetEvents.add(it.copy(showBottomSpacing = false)) }
 
     return WidgetSnapshot(
