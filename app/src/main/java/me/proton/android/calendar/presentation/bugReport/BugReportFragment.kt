@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.bugReport
 
 import android.content.DialogInterface
 import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +45,15 @@ class BugReportFragment : BaseDialogFragment<FragmentBugReportBinding>(), KoinCo
     private val calendarViewModel: CalendarViewModel by activityViewModels()
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentBugReportBinding.inflate(inflater, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.bugReportRefreshLayout.setOnSingleClickListener {
+            // refresh runs in the activity-scoped view model, so it keeps going after we close this screen
+            calendarViewModel.refreshNow()
+            findNavController().navigateUp()
+        }
+    }
 
     override fun onBackPressedCustom() {
         if (binding.bugReportTitle.text.isNotEmpty() || binding.bugReportDescription.text.isNotEmpty()) {
