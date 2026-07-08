@@ -22,8 +22,12 @@ class CalendarApiClient @Inject constructor(
     override val appVersionHeader = "${API_APPLICATION_NAME}@${BuildConfig.VERSION_NAME}${if (BuildConfig.DEBUG) API_DEBUG_APPLICATION_SUFFIX else ""}"
     override val enableDebugLogging = BuildConfig.DEBUG
 
-    override suspend fun shouldUseDoh(): Boolean = defaultSharedPreferencesProvider.sharedPreferences.getBoolean(
-        SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
+    override suspend fun shouldUseDoh(): Boolean {
+        val prefs = defaultSharedPreferencesProvider.sharedPreferences
+        val enabledLocally = prefs.getBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
+        val disabledRemotely = prefs.getBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING_REMOTELY_DISABLED, false)
+        return enabledLocally && !disabledRemotely
+    }
 
     override val userAgent: String
         get() = "${USER_AGENT_NAME}/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.RELEASE}; ${Build.BRAND} ${Build.MODEL})"
