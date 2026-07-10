@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -14,7 +15,10 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import me.proton.android.calendar.common.FETCH_FEATURE_FLAG_INTERVAL_SECONDS
+import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.MeetIntegrationType
@@ -30,6 +34,7 @@ import javax.inject.Inject
 class FeatureFlagViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val featureFlagManager: FeatureFlagManager,
+    private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -46,6 +51,7 @@ class FeatureFlagViewModel @Inject constructor(
     var refreshButtonAndroidFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
+    private var alternativeRoutingKillSwitchJob: Job? = null
 
     fun prefetchForCurrentUser() {
         if (System.currentTimeMillis().minus(lastFetchMs) <= TimeUnit.SECONDS.toMillis(FETCH_FEATURE_FLAG_INTERVAL_SECONDS)) return
@@ -123,6 +129,17 @@ class FeatureFlagViewModel @Inject constructor(
         ).map {
             it?.value ?: CalendarFeatureFlag.RefreshButton.fallbackValue
         }.asLiveData(Dispatchers.Default)
+
+        alternativeRoutingKillSwitchJob?.cancel()
+        alternativeRoutingKillSwitchJob = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.DisableAlternativeRouting.featureId
+        ).onEach { flag ->
+            val disabled = flag?.value ?: CalendarFeatureFlag.DisableAlternativeRouting.fallbackValue
+            defaultSharedPreferencesProvider.sharedPreferences.edit()
+                .putBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING_REMOTELY_DISABLED, disabled)
+                .apply()
+        }.launchIn(viewModelScope)
     }
 
     private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {

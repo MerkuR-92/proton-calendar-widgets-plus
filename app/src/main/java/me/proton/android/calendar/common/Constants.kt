@@ -142,6 +142,7 @@ object ApiResponseCode {
 object SharedPreferencesKeys {
     const val THEME = "theme"
     const val ALTERNATIVE_ROUTING = "alternative_routing"
+    const val ALTERNATIVE_ROUTING_REMOTELY_DISABLED = "alternative_routing_remotely_disabled"
     const val VIEW_MODE = "view_mode"
     const val USE_DEFAULT_VIEW_MODE = "use_default_view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
