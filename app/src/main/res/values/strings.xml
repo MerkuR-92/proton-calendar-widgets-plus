@@ -455,6 +455,7 @@
     <string name="notification_text_tomorrow_part_time">Tomorrow at %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s at %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">If your calendar app appears empty, refreshing may resolve the issue.</string>
     <string name="bug_report_hint_title">Subject</string>
     <string name="bug_report_hint_description">Please describe the problem and include any error messages.</string>
     <string name="bug_report_discard_changes_title">Unsaved Changes</string>

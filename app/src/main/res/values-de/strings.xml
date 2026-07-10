@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">Morgen um %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s um %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">Wenn die Kalender-App leer erscheint, kann eine Aktualisierung das Problem beheben.</string>
     <string name="bug_report_hint_title">Betreff</string>
     <string name="bug_report_hint_description">Bitte beschreibe das Problem und füge alle Fehlermeldungen hinzu.</string>
     <string name="bug_report_discard_changes_title">Ungespeicherte Änderungen</string>

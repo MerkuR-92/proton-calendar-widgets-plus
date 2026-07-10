@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">Jutro o godzinie %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s o godzinie %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">Jeśli aplikacja Kalendarz wydaje się pusta, odświeżenie może rozwiązać problem.</string>
     <string name="bug_report_hint_title">Temat</string>
     <string name="bug_report_hint_description">Opisz problem i dołącz wszelkie informacje o błędach.</string>
     <string name="bug_report_discard_changes_title">Niezapisane zmiany</string>
