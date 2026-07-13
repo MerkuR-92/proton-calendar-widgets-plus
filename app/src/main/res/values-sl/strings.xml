@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">Jutri ob %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s ob %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">Če je vaš koledar brez vsebine, lahko težavo odpravi osvežitev podatkov.</string>
     <string name="bug_report_hint_title">Zadeva</string>
     <string name="bug_report_hint_description">Opišite težavo in vključite morebitna sporočila o napakah.</string>
     <string name="bug_report_discard_changes_title">Neshranjene spremembe</string>

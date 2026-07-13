@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">내일 %1$s에</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s %2$s 에</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">If your calendar app appears empty, refreshing may resolve the issue.</string>
     <string name="bug_report_hint_title">제목</string>
     <string name="bug_report_hint_description">문제를 설명해 주시고 오류 메시지를 포함해 주십시오.</string>
     <string name="bug_report_discard_changes_title">저장되지 않은 변경 사항</string>

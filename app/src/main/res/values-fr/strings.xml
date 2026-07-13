@@ -446,7 +446,7 @@
     <string name="notification_text_tomorrow_part_time">Demain à %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s à %2$s</string>
     <!-- Bug report -->
-    <string name="bug_report_refresh_disclaimer">Si l\'application Calendrier semble vide, l\'actualiser peut résoudre le problème.</string>
+    <string name="bug_report_refresh_disclaimer">Si votre application de calendrier semble vide, une actualisation pourrait résoudre le problème.</string>
     <string name="bug_report_hint_title">Objet</string>
     <string name="bug_report_hint_description">Décrivez le problème et incluez les éventuels messages d\'erreur.</string>
     <string name="bug_report_discard_changes_title">Les modifications ne sont pas enregistrées.</string>

@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">कल %1$s बजे</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s %2$s बजे</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">If your calendar app appears empty, refreshing may resolve the issue.</string>
     <string name="bug_report_hint_title">विषय</string>
     <string name="bug_report_hint_description">कृपया समस्या का विवरण दें और यदि कोई त्रुटि संदेश हो तो उसे शामिल करें।</string>
     <string name="bug_report_discard_changes_title">असहेजे गए बदलाव</string>

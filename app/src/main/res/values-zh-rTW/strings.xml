@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">明天，於 %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s，於 %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">If your calendar app appears empty, refreshing may resolve the issue.</string>
     <string name="bug_report_hint_title">主旨</string>
     <string name="bug_report_hint_description">請詳細描述發現的問題，若有出現任何錯誤訊息，還請您一併附上進行通報。</string>
     <string name="bug_report_discard_changes_title">未儲存的變更</string>
