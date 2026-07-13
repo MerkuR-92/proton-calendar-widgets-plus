@@ -106,7 +106,8 @@
     <string name="event_change_answer_recurring_title">Ismétlődő esemény frissítése</string>
     <string name="event_change_answer_recurring_description">Szeretné a válaszát a sorozat valamennyi eseményénél frissíteni?</string>
     <string name="event_change_answer_recurring_overwrite_description">Szeretné a válaszát a sorozat valamennyi eseményénél frissíteni?\nEbben az esetben, a rendező által néhány alkalomnál megváltoztatott, korábbi válasza elveszik.</string>
-    <string name="event_change_answer_recurring_single_edit_description">Az eseményt a szervező frissítette. Szeretné a válaszát csak ennél az alkalomnál módosítani?egz esemény</string>
+    <string name="event_change_answer_recurring_single_edit_description">Az eseményt a szervező frissítette. Szeretné a válaszát csak ennél az alkalomnál módosítani?egz esemény
+</string>
     <string name="event_change_answer_recurring_cancel">Mégsem</string>
     <string name="event_change_answer_recurring_confirm">Frissítés</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s elfogadta a meghívását: %2$s</string>
@@ -446,6 +447,7 @@
     <string name="notification_text_tomorrow_part_time">Holnap %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">If your calendar app appears empty, refreshing may resolve the issue.</string>
     <string name="bug_report_hint_title">Tárgy</string>
     <string name="bug_report_hint_description">Kérjük, írja le a problémát és másolja be az esetleges hibaüzeneteket.</string>
     <string name="bug_report_discard_changes_title">Nem mentett módosítások</string>

@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">明天 %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s 在 %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">如果您的日历应用显示为空，刷新可能会解决问题。</string>
     <string name="bug_report_hint_title">主题</string>
     <string name="bug_report_hint_description">请描述问题并包含显示的错误信息.</string>
     <string name="bug_report_discard_changes_title">未保存的更改</string>

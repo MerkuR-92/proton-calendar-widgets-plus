@@ -446,6 +446,7 @@
     <string name="notification_text_tomorrow_part_time">Zajtra o %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s o %2$s</string>
     <!-- Bug report -->
+    <string name="bug_report_refresh_disclaimer">Ak sa vám zdá, že aplikácia kalendára je prázdna, problém by mohlo vyriešiť jej obnovenie.</string>
     <string name="bug_report_hint_title">Predmet</string>
     <string name="bug_report_hint_description">Popíšte problém, prosím, a priložte všetky chybové správy.</string>
     <string name="bug_report_discard_changes_title">Neuložené zmeny</string>
