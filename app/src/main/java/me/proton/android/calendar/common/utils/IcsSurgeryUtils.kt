@@ -64,6 +64,7 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.math.ceil
 
 object IcsSurgeryUtils {
@@ -531,19 +532,22 @@ object IcsSurgeryUtils {
                 val hasSeconds = alarm.trigger.duration.seconds?.let { 1 } ?: 0
                 if (hasWeeks + hasDays + hasHours + hasMinutes + hasSeconds > 1) {
                     val durationInMs = alarm.trigger.duration.toMillis()
-                    // Use smallest unit for the duration
-                    val simplifiedDuration =
-                        if (hasSeconds.toBoolean()) {
-                            Duration.builder().seconds(TimeUnit.MILLISECONDS.toSeconds(durationInMs).toInt()).build()
-                        } else if (hasMinutes.toBoolean()) {
-                            Duration.builder().minutes(TimeUnit.MILLISECONDS.toMinutes(durationInMs).toInt()).build()
-                        } else if (hasHours.toBoolean()) {
-                            Duration.builder().hours(TimeUnit.MILLISECONDS.toHours(durationInMs).toInt()).build()
-                        } else if (hasDays.toBoolean()) {
-                            Duration.builder().days(TimeUnit.MILLISECONDS.toDays(durationInMs).toInt()).build()
-                        } else {
-                            Duration.builder().weeks(TimeUnit.MILLISECONDS.toDays(durationInMs).div(7).toInt()).build()
-                        }
+                    // keep sign up front or it prints as PT-900S which the server rejects
+                    val prior = durationInMs < 0
+                    val absMs = abs(durationInMs)
+                    val week = TimeUnit.DAYS.toMillis(7)
+                    val day = TimeUnit.DAYS.toMillis(1)
+                    val hour = TimeUnit.HOURS.toMillis(1)
+                    val minute = TimeUnit.MINUTES.toMillis(1)
+                    // largest exact unit so 900s becomes -PT15M not -PT900S
+                    val builder = Duration.builder().prior(prior)
+                    val simplifiedDuration = when {
+                        absMs % week == 0L -> builder.weeks((absMs / week).toInt())
+                        absMs % day == 0L -> builder.days((absMs / day).toInt())
+                        absMs % hour == 0L -> builder.hours((absMs / hour).toInt())
+                        absMs % minute == 0L -> builder.minutes((absMs / minute).toInt())
+                        else -> builder.seconds((absMs / TimeUnit.SECONDS.toMillis(1)).toInt())
+                    }.build()
                     alarm.trigger.setDuration(simplifiedDuration, alarm.trigger.related)
                 }
             }
