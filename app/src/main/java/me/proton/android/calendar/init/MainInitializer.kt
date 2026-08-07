@@ -26,7 +26,6 @@ import me.proton.core.crypto.validator.presentation.init.CryptoValidatorInitiali
 import me.proton.core.humanverification.presentation.HumanVerificationInitializer
 import me.proton.core.keytransparency.presentation.init.KeyTransparencyInitializer
 import me.proton.core.network.presentation.init.UnAuthSessionFetcherInitializer
-import me.proton.core.paymentiap.presentation.GooglePurchaseHandlerInitializer
 import me.proton.core.plan.presentation.PurchaseHandlerInitializer
 import me.proton.core.plan.presentation.UnredeemedPurchaseInitializer
 import me.proton.core.userrecovery.presentation.compose.DeviceRecoveryInitializer
@@ -48,7 +47,6 @@ class MainInitializer : Initializer<Unit> {
         PeriodicWorkerInitializer::class.java,
         UnredeemedPurchaseInitializer::class.java,
         PurchaseHandlerInitializer::class.java,
-        GooglePurchaseHandlerInitializer::class.java,
         UnAuthSessionFetcherInitializer::class.java,
         KeyTransparencyInitializer::class.java,
         DeviceRecoveryInitializer::class.java,

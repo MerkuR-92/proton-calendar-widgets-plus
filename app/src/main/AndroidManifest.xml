@@ -94,10 +94,6 @@
                     android:value="androidx.startup"
                     tools:node="remove" />
                 <meta-data
-                    android:name="me.proton.core.paymentiap.presentation.GooglePurchaseHandlerInitializer"
-                    android:value="androidx.startup"
-                    tools:node="remove" />
-                <meta-data
                     android:name="me.proton.android.calendar.init.KoinInitializer"
                     android:value="androidx.startup"
                     tools:node="remove"/>
