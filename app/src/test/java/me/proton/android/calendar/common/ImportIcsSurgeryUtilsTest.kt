@@ -517,7 +517,40 @@ internal class ImportIcsSurgeryUtilsTest {
         iCalendar.events.forEach { event ->
             assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("-P1W3DT4H")
             event.cleanAlarms()
-            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("PT-244H")
+            // single unit sign up front not the old invalid PT-244H
+            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("-PT244H")
+        }
+    }
+
+    @Test
+    fun `cleanAlarms part day event VALARM zero padded components TRIGGER`() {
+
+        // zero components used to make this simplify to the invalid PT-900S
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:icalendar
+    CALSCALE:GREGORIAN
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    DTSTAMP:20210204T130756Z
+    DTSTART;TZID=Europe/Paris:20210223T090000
+    DTEND;TZID=Europe/Paris:20210223T094000
+    SUMMARY:Test alarms
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER:-P0DT0H15M0S
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        iCalendar.events.forEach { event ->
+            event.cleanAlarms()
+            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("-PT15M")
         }
     }
 
