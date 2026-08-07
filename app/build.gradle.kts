@@ -253,9 +253,9 @@ dependencies {
     implementation(libs.core.network)
     implementation(libs.core.observability)
     implementation(libs.core.passValidator)
-    implementation(libs.core.payment)
-    implementation(libs.core.paymentIap)
-    implementation(libs.core.plan)
+    // no IAP in Calendar — keep Google Play Billing out of the app
+    implementation(libs.core.payment) { exclude(group = "com.android.billingclient") }
+    implementation(libs.core.plan) { exclude(group = "com.android.billingclient") }
     implementation(libs.core.proguard.rules)
     implementation(libs.core.presentation)
     implementation(libs.core.push)
@@ -415,7 +415,7 @@ object Config {
     const val compileSdk = 36
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
-    const val targetSdk = 35
+    const val targetSdk = 36
     const val versionCode = 353
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
     const val versionName = "2.33.0"

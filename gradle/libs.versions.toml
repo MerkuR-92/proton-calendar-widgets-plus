@@ -115,7 +115,6 @@ core-notification = { module = "me.proton.core:notification", version.ref = "cor
 core-observability = { module = "me.proton.core:observability", version.ref = "core" }
 core-passValidator = { module = "me.proton.core:pass-validator", version.ref = "core" }
 core-payment = { module = "me.proton.core:payment", version.ref = "core" }
-core-paymentIap = { module = "me.proton.core:payment-iap", version.ref = "core" }
 core-plan = { module = "me.proton.core:plan", version.ref = "core" }
 core-plan-test = { module = "me.proton.core:plan-test", version.ref = "core" }
 core-presentation = { module = "me.proton.core:presentation", version.ref = "core" }
