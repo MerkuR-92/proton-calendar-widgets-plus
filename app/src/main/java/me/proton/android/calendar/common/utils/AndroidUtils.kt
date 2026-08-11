@@ -1465,4 +1465,28 @@ object AndroidUtils {
             insets
         }
     }
+
+    // system bar insets as padding, so backgrounds stay edge-to-edge behind the bars
+    fun applyMainShellInsets(root: View, content: View, drawer: View) {
+        val contentPad = intArrayOf(content.paddingLeft, content.paddingTop, content.paddingRight, content.paddingBottom)
+        val drawerPad = intArrayOf(drawer.paddingLeft, drawer.paddingTop, drawer.paddingRight, drawer.paddingBottom)
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            content.updatePadding(
+                left = contentPad[0] + bars.left,
+                top = contentPad[1] + bars.top,
+                right = contentPad[2] + bars.right,
+                bottom = contentPad[3] + maxOf(bars.bottom, ime.bottom),
+            )
+            drawer.updatePadding(
+                left = drawerPad[0] + bars.left,
+                top = drawerPad[1] + bars.top,
+                right = drawerPad[2] + bars.right,
+                bottom = drawerPad[3] + bars.bottom,
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(root)
+    }
 }

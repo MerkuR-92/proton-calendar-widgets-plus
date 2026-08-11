@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -25,8 +26,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.LiveData
@@ -321,7 +324,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             return
         }
 
-        AndroidUtils.applyAndroid15EdgeToEdge(view)
+        AndroidUtils.applyMainShellInsets(
+            root = binding.drawerLayout,
+            content = binding.navHostFragmentContainerView,
+            drawer = binding.navViewMainContent.root,
+        )
 
         // TODO bring it back after we contain performance issues or make it more async, maybe when leaving the app?
         // widgetRefresher.broadcastRefresh()
@@ -1229,7 +1236,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    // dark background (open drawer, or the calendar in night mode) needs light icons
+    private fun applySystemBarIconAppearance(drawerOpen: Boolean) {
+        val darkBackground = drawerOpen || isInNightMode()
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !darkBackground
+            isAppearanceLightNavigationBars = !darkBackground
+        }
+    }
+
+    private fun isInNightMode(): Boolean =
+        resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+
     private fun initDrawerListeners() {
+        applySystemBarIconAppearance(drawerOpen = false)
+        binding.drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            private var open = false
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                val nowOpen = slideOffset > 0.5f
+                if (nowOpen != open) {
+                    open = nowOpen
+                    applySystemBarIconAppearance(drawerOpen = nowOpen)
+                }
+            }
+        })
+
         //Navigation drawer items on click listeners
         binding.navViewMainContent.navViewUserLayout.setOnSingleClickListener {
             binding.drawerLayout.close()
