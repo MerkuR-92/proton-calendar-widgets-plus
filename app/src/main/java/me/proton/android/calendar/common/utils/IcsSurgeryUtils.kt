@@ -664,11 +664,12 @@ object IcsSurgeryUtils {
                 val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
                 // Round up
                 val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
-                dateEnd.time = this.dateStart.value.toZonedDateTime(ZoneId.systemDefault().id).plusDays(
+                val endTime = this.dateStart.value.toZonedDateTime(ZoneId.systemDefault().id).plusDays(
                     if (durationInDaysRoundedUp == 0L) 1 // DTEND must always be at least DTSTART + 1 day for all day event
                     else durationInDaysRoundedUp
                 ).toInstant().toEpochMilli()
-                this.setDateEnd(dateEnd)
+                // fresh date-only value so its rawComponents match .time (clone would keep DTSTART's)
+                this.setDateEnd(Date(endTime), false)
                 // Set DTEND timezone
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             }
@@ -699,9 +700,8 @@ object IcsSurgeryUtils {
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             } else {
                 // For full day, the DTEND is by default set to the day after DTSTART such that the event is one day long
-                val dateEnd = this.dateStart.value.clone() as ICalDate
-                dateEnd.time += TimeUnit.DAYS.toMillis(1)
-                this.setDateEnd(dateEnd)
+                // fresh date-only value so its rawComponents match the bumped .time (clone would keep DTSTART's)
+                this.setDateEnd(Date(this.dateStart.value.time + TimeUnit.DAYS.toMillis(1)), false)
                 // Set DTEND timezone
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             }

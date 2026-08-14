@@ -175,7 +175,9 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return if (this.hasTime()) {
             ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
         } else {
-            this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
+            // all-day events are floating: resolve from the literal date at midnight, never via systemDefault
+            rawComponents?.let { LocalDate.of(it.year, it.month, it.date).atStartOfDay(ZoneId.of(timezone)) }
+                ?: this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
         }
     }
 
