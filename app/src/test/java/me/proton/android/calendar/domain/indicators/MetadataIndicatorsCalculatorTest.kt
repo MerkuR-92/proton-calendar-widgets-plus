@@ -1,9 +1,12 @@
 package me.proton.android.calendar.domain.indicators
 
+import app.cash.turbine.test
 import biweekly.util.DayOfWeek as BiweeklyDayOfWeek
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import me.proton.android.calendar.common.MAX_CALENDAR_INDICATORS
@@ -59,6 +62,7 @@ class MetadataIndicatorsCalculatorTest {
         eventColorOverrides: Map<String, String?> = emptyMap(),
     ) {
         coEvery { calendarsRepo.selectAllCalendars(userId.id) } returns calendars
+        every { calendarsRepo.flowAllCalendars(userId.id) } returns flowOf(calendars)
         every { getUserInfo() } returns flowOf(
             UserInfo(userId = userId, addresses = emptyList(), hasSubscriptionForMail = hasSubscriptionForMail)
         )
@@ -76,15 +80,42 @@ class MetadataIndicatorsCalculatorTest {
     @Test
     fun `compute returns empty when no visible calendars`() = runTest {
         stubBaseHappyPath(calendars = emptyList())
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
         assertTrue(result.isEmpty())
     }
 
     @Test
     fun `compute returns empty when no occurrences`() = runTest {
         stubBaseHappyPath()
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `compute re-emits when an occurrence row is deleted`() = runTest {
+        // dots must drop when the event is deleted
+        val start = from.atStartOfDay(zone).plusHours(9)
+        val end = start.plusHours(1)
+        val nonRecurringFlow = MutableStateFlow(listOf(nonRecurring("e1", "u1", "c1", start, end)))
+
+        every { calendarsRepo.flowAllCalendars(userId.id) } returns flowOf(listOf(cal1, cal2))
+        coEvery { calendarsRepo.selectAllCalendars(userId.id) } returns listOf(cal1, cal2)
+        every { getUserInfo() } returns flowOf(
+            UserInfo(userId = userId, addresses = emptyList(), hasSubscriptionForMail = false)
+        )
+        every { occurrencesDao.selectNonRecurringBetweenInclusive(any(), any(), any(), any()) } returns nonRecurringFlow
+        every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns
+                flowOf(emptyList<EventOccurrenceEntity>())
+        every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns
+                flowOf(emptyList<EventOccurrenceEntity>())
+        every { eventsDao.selectEventColorsById(any()) } returns emptyList()
+
+        calculator.compute(userId.id, from, to, tz).test {
+            assertEquals(setOf(from), awaitItem().keys)
+            nonRecurringFlow.value = emptyList() // event deleted
+            assertTrue(awaitItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -96,7 +127,7 @@ class MetadataIndicatorsCalculatorTest {
         )
         stubBaseHappyPath(nonRecurring = rows)
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(setOf(day), result.keys)
         assertEquals(listOf("#00FF00", "#FF0000"), result[day])
@@ -108,7 +139,7 @@ class MetadataIndicatorsCalculatorTest {
         val end = from.plusDays(2).atStartOfDay(zone).plusHours(14)
         stubBaseHappyPath(nonRecurring = listOf(nonRecurring("e1", "u1", "c1", start, end)))
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(setOf(from, from.plusDays(1), from.plusDays(2)), result.keys)
         result.values.forEach { assertEquals(listOf("#FF0000"), it) }
@@ -120,20 +151,62 @@ class MetadataIndicatorsCalculatorTest {
         val end = from.plusDays(1).atStartOfDay(zone) // exactly midnight
         stubBaseHappyPath(nonRecurring = listOf(nonRecurring("e1", "u1", "c1", start, end)))
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(setOf(from), result.keys)
     }
 
     @Test
     fun `compute spans single all-day event on its date only`() = runTest {
-        val start = from.atStartOfDay(zone)
-        val end = from.plusDays(1).atStartOfDay(zone)
+        // all-day events are stored at UTC midnight (server convention), not local midnight
+        val utc = ZoneId.of("UTC")
+        val start = from.atStartOfDay(utc)
+        val end = from.plusDays(1).atStartOfDay(utc)
         stubBaseHappyPath(nonRecurring = listOf(nonRecurring("e1", "u1", "c1", start, end, fullDay = true)))
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(setOf(from), result.keys)
+    }
+
+    @Test
+    fun `compute keeps all-day event on its date under a west-of-UTC display timezone`() = runTest {
+        // all-day events are stored at UTC midnight; a display tz west of UTC must not shift them a day earlier
+        val utc = ZoneId.of("UTC")
+        val pagoPago = "Pacific/Pago_Pago" // UTC-11
+        val eventDate = LocalDate.of(2026, 6, 21)
+        val start = eventDate.atStartOfDay(utc)
+        val end = eventDate.plusDays(1).atStartOfDay(utc)
+        stubBaseHappyPath(nonRecurring = listOf(nonRecurring("e1", "u1", "c1", start, end, fullDay = true)))
+
+        val result = calculator
+            .compute(userId.id, LocalDate.of(2026, 6, 15), LocalDate.of(2026, 6, 28), pagoPago)
+            .first()
+
+        assertEquals(setOf(eventDate), result.keys)
+    }
+
+    @Test
+    fun `compute keeps recurring all-day event on its date under an east-of-UTC display timezone`() = runTest {
+        // recurring all-day: a display tz east of UTC must not shift the dot a day earlier
+        val displayTz = "Europe/Zurich" // UTC+2 in June
+        val firstOccurrence = LocalDate.of(2025, 6, 3)
+        stubBaseHappyPath(
+            finiteRecurring = listOf(
+                recurringAllDay("eAd", "uAd", "c1", firstOccurrence, "FREQ=DAILY;COUNT=3"),
+            ),
+        )
+
+        val result = calculator.compute(userId.id, from, to, displayTz).first()
+
+        assertEquals(
+            setOf(
+                LocalDate.of(2025, 6, 3),
+                LocalDate.of(2025, 6, 4),
+                LocalDate.of(2025, 6, 5),
+            ),
+            result.keys,
+        )
     }
 
     @Test
@@ -150,7 +223,7 @@ class MetadataIndicatorsCalculatorTest {
         }
         stubBaseHappyPath(nonRecurring = rows)
 
-        val colors = calculator.compute(userId.id, from, to, tz)[day]!!
+        val colors = calculator.compute(userId.id, from, to, tz).first()[day]!!
 
         assertEquals(MAX_CALENDAR_INDICATORS, colors.size)
         assertEquals(colors.sorted(), colors)
@@ -173,7 +246,7 @@ class MetadataIndicatorsCalculatorTest {
         )
         stubBaseHappyPath(infiniteRecurring = listOf(occ))
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
         assertTrue(result.isEmpty())
     }
 
@@ -187,7 +260,7 @@ class MetadataIndicatorsCalculatorTest {
             eventColorOverrides = mapOf("e1" to "#0000FF"),
         )
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(listOf("#FF0000"), result[from])
     }
@@ -202,7 +275,7 @@ class MetadataIndicatorsCalculatorTest {
             eventColorOverrides = mapOf("e1" to "#0000FF"),
         )
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(listOf("#0000FF"), result[from])
     }
@@ -217,7 +290,7 @@ class MetadataIndicatorsCalculatorTest {
             eventColorOverrides = emptyMap(),
         )
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
 
         assertEquals(listOf("#FF0000"), result[from])
     }
@@ -231,7 +304,7 @@ class MetadataIndicatorsCalculatorTest {
             calendars = listOf(cal1), // cHidden not in visible set
         )
 
-        val result = calculator.compute(userId.id, from, to, tz)
+        val result = calculator.compute(userId.id, from, to, tz).first()
         assertTrue(result.isEmpty())
     }
 
@@ -261,7 +334,7 @@ class MetadataIndicatorsCalculatorTest {
         )
         stubBaseHappyPath(finiteRecurring = listOf(recurringRow))
 
-        val result = calculator.compute(userId.id, from, to, tzId)
+        val result = calculator.compute(userId.id, from, to, tzId).first()
 
         assertEquals(
             setOf(
@@ -293,7 +366,7 @@ class MetadataIndicatorsCalculatorTest {
         assertEquals(8, numberByDate[LocalDate.of(2025, 6, 5)])
         assertEquals(11, numberByDate[LocalDate.of(2025, 6, 8)])
 
-        val indicators = calculator.compute(userId.id, from, to, tzId)
+        val indicators = calculator.compute(userId.id, from, to, tzId).first()
         assertEquals((2..8).map { LocalDate.of(2025, 6, it) }.toSet(), indicators.keys)
     }
 
@@ -315,7 +388,7 @@ class MetadataIndicatorsCalculatorTest {
         assertEquals(8, numberByDate[LocalDate.of(2025, 6, 4)]) // Wed
         assertEquals(9, numberByDate[LocalDate.of(2025, 6, 6)]) // Fri
 
-        val indicators = calculator.compute(userId.id, from, to, tzId)
+        val indicators = calculator.compute(userId.id, from, to, tzId).first()
         assertEquals(
             setOf(LocalDate.of(2025, 6, 2), LocalDate.of(2025, 6, 4), LocalDate.of(2025, 6, 6)),
             indicators.keys,
@@ -425,6 +498,35 @@ class MetadataIndicatorsCalculatorTest {
         endTimeZone = tzId,
         exDates = exDates,
     )
+
+    private fun recurringAllDay(
+        eventId: String,
+        uid: String,
+        calendarId: String,
+        firstOccurrenceDate: LocalDate,
+        rRule: String,
+    ): EventOccurrenceEntity {
+        // all-day events are stored at UTC midnight (server convention: startTz="UTC")
+        val utc = ZoneId.of("UTC")
+        val startUtc = firstOccurrenceDate.atStartOfDay(utc).toEpochSecond()
+        val endUtc = firstOccurrenceDate.plusDays(1).atStartOfDay(utc).toEpochSecond()
+        return EventOccurrenceEntity(
+            userId = userId.id,
+            calendarId = calendarId,
+            eventId = eventId,
+            eventUid = uid,
+            fullDay = 1,
+            startTime = startUtc,
+            endTime = endUtc,
+            windowStartTime = startUtc - 86_400,
+            windowEndTime = startUtc + 86_400L * 365,
+            firstOccurrenceStartTime = startUtc,
+            rRule = rRule,
+            modifyTime = 1L,
+            startTimeZone = "UTC",
+            endTimeZone = "UTC",
+        )
+    }
 
     private fun calendar(id: String, color: String) = Calendar(
         id = id,

@@ -8,6 +8,7 @@ import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.RecurrenceId
 import biweekly.property.RecurrenceRule
+import biweekly.util.DateTimeComponents
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.R
@@ -421,6 +422,9 @@ object EventUtilsImpl : EventUtils {
                         hasTime = true
                         val occurrenceStart = startIteratorNext.toZonedDateTime(timezone ?: iteratorTimezone.id, !isAllDay()).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
                         exceptionDates.values.add(ICalDate(Date.from(occurrenceStart.toInstant()), hasTime))
+                    } else if (isAllDay()) {
+                        // give the all-day exdate literal date components so it resolves floating, matching the occurrences it excludes
+                        exceptionDates.values.add(ICalDate(startIteratorNext, DateTimeComponents.parse(DateTimeComponents(startIteratorNext).toString(false, false)), false))
                     } else {
                         exceptionDates.values.add(ICalDate(startIteratorNext, hasTime))
                     }

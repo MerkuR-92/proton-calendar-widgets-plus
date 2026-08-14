@@ -20,7 +20,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
@@ -31,7 +30,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
@@ -82,7 +80,6 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
@@ -448,7 +445,6 @@ class CalendarViewModel @Inject constructor(
         }.flowOn(Dispatchers.IO).cancellable()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun calendarIndicators(
         fromDate: LocalDate,
         toDate: LocalDate,
@@ -459,12 +455,7 @@ class CalendarViewModel @Inject constructor(
             emit(emptyMap())
             return@flow
         }
-        emitAll(
-            calendarsRepository.flowAllCalendars(uid)
-                .map { calendars -> calendars.filterVisibleCalendars().map { it.id to it.color } }
-                .distinctUntilChanged()
-                .mapLatest { metadataIndicatorsCalculator.compute(uid, fromDate, toDate, timeZoneId) }
-        )
+        emitAll(metadataIndicatorsCalculator.compute(uid, fromDate, toDate, timeZoneId))
     }
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState

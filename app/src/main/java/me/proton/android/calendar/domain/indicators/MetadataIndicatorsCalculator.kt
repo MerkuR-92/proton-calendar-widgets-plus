@@ -2,14 +2,24 @@ package me.proton.android.calendar.domain.indicators
 
 import biweekly.property.Status
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.MAX_CALENDAR_INDICATORS
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.KotlinUtilsImpl.debounceExceptFirst
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
@@ -19,14 +29,17 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Computes mini-calendar indicator dots/skeleton from server-plaintext data
  * (no decryption for near-immediate UI feedback)
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class MetadataIndicatorsCalculator @Inject constructor(
     private val database: AppDatabase,
@@ -48,26 +61,15 @@ class MetadataIndicatorsCalculator @Inject constructor(
     )
 
     // mirrors CalendarViewModel.calendarIndicators but skips decryption
-    suspend fun compute(
+    fun compute(
         userId: String,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-    ): Map<LocalDate, List<String>> = withContext(Dispatchers.Default) {
-        val occurrences = generateOccurrences(userId, fromDate, toDate, timeZoneId)
-        val indicators = mutableMapOf<LocalDate, MutableList<String>>()
-        for (occ in occurrences) {
-            addSpannedDays(
-                startInstant = occ.startInstant,
-                endInstant = occ.endInstant,
-                isAllDay = occ.fullDay,
-                timeZoneId = timeZoneId,
-                color = occ.color,
-                indicators = indicators,
-            )
-        }
-        indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
-    }
+    ): Flow<Map<LocalDate, List<String>>> =
+        observeSkeletonOccurrences(userId, fromDate, toDate, timeZoneId)
+            .map { occurrences -> withContext(Dispatchers.Default) { occurrencesToIndicators(occurrences, timeZoneId) } }
+            .distinctUntilChanged()
 
     // mirrors GetUiEventsUseCase.execute but skips decryption
     suspend fun computeSkeletonUiEvents(
@@ -77,7 +79,9 @@ class MetadataIndicatorsCalculator @Inject constructor(
         timeZoneId: String,
     ): List<UiEvent> = withContext(Dispatchers.Default) {
         val zone = ZoneId.of(timeZoneId)
-        generateOccurrences(userId, fromDate, toDate, timeZoneId).map { occ ->
+        observeSkeletonOccurrences(userId, fromDate, toDate, timeZoneId).first().map { occ ->
+            // all-day is anchored at UTC midnight; read in UTC so the day doesn't shift with display tz
+            val occZone = if (occ.fullDay) ZoneOffset.UTC else zone
             UiEvent(
                 id = occ.eventId,
                 calendarId = occ.calendarId,
@@ -85,8 +89,8 @@ class MetadataIndicatorsCalculator @Inject constructor(
                 summary = null,
                 location = null,
                 description = null,
-                dateStart = occ.startInstant.atZone(zone),
-                dateEnd = occ.endInstant.atZone(zone),
+                dateStart = occ.startInstant.atZone(occZone),
+                dateEnd = occ.endInstant.atZone(occZone),
                 isAllDay = occ.fullDay,
                 occurrenceNumber = occ.occurrenceNumber,
                 displayColor = occ.color,
@@ -98,9 +102,84 @@ class MetadataIndicatorsCalculator @Inject constructor(
         }.distinct() // mirror GetUiEventsUseCase's .distinct() so skeleton rows align with the real ones
     }
 
-     // mirrors GetUiEventsUseCase for row fetch, filter and expansion
-    private suspend fun generateOccurrences(
+    private fun occurrencesToIndicators(
+        occurrences: List<SkeletonOccurrence>,
+        timeZoneId: String,
+    ): Map<LocalDate, List<String>> {
+        val indicators = mutableMapOf<LocalDate, MutableList<String>>()
+        for (occ in occurrences) {
+            addSpannedDays(
+                startInstant = occ.startInstant,
+                endInstant = occ.endInstant,
+                isAllDay = occ.fullDay,
+                timeZoneId = timeZoneId,
+                color = occ.color,
+                indicators = indicators,
+            )
+        }
+        return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
+    }
+
+    private fun observeSkeletonOccurrences(
         userId: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+    ): Flow<List<SkeletonOccurrence>> {
+        val (fromEpoch, toEpoch) = windowEpochs(fromDate, toDate, timeZoneId)
+        return calendarsRepository.flowAllCalendars(userId)
+            .map { it.filterVisibleCalendars() }
+            .distinctUntilChanged()
+            .debounceExceptFirst(1.seconds)
+            .flatMapLatest { visibleCalendars ->
+                if (visibleCalendars.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val calendarIds = visibleCalendars.map { it.id }
+                    combine(
+                        database.eventOccurrencesDao()
+                            .selectNonRecurringBetweenInclusive(userId, calendarIds, fromEpoch, toEpoch)
+                            .debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                        database.eventOccurrencesDao()
+                            .selectFiniteRecurring(userId, calendarIds, fromEpoch, toEpoch)
+                            .debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                        database.eventOccurrencesDao()
+                            .selectInfiniteRecurring(userId, calendarIds, toEpoch)
+                            .debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                        getUserInfoUseCase()
+                            .debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                    ) { nonRecurring, finiteRecurring, infiniteRecurringRaw, userInfo ->
+                        withContext(Dispatchers.Default) {
+                            buildOccurrences(
+                                visibleCalendars = visibleCalendars,
+                                nonRecurring = nonRecurring,
+                                finiteRecurring = finiteRecurring,
+                                infiniteRecurringRaw = infiniteRecurringRaw,
+                                isFreeUser = !userInfo.hasSubscriptionForMail,
+                                fromDate = fromDate,
+                                toDate = toDate,
+                                timeZoneId = timeZoneId,
+                            )
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun windowEpochs(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Pair<Long, Long> {
+        val zone = ZoneId.of(timeZoneId)
+        val fromEpoch = fromDate.atStartOfDay(zone).toInstant().epochSecond
+        val toEpoch = toDate.plusDays(1).atStartOfDay(zone).toInstant().epochSecond
+        return fromEpoch to toEpoch
+    }
+
+    // mirrors GetUiEventsUseCase for row filter and expansion
+    private fun buildOccurrences(
+        visibleCalendars: List<Calendar>,
+        nonRecurring: List<EventOccurrenceEntity>,
+        finiteRecurring: List<EventOccurrenceEntity>,
+        infiniteRecurringRaw: List<EventOccurrenceEntity>,
+        isFreeUser: Boolean,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
@@ -111,21 +190,7 @@ class MetadataIndicatorsCalculator @Inject constructor(
         val fromEpoch = fromInstant.epochSecond
         val toEpoch = toEndInstant.epochSecond
 
-        val visibleCalendars = calendarsRepository.selectAllCalendars(userId).filterVisibleCalendars()
         val colorByCalendarId = visibleCalendars.associate { it.id to it.color }
-        val visibleCalendarIds = colorByCalendarId.keys.toList()
-
-        if (visibleCalendarIds.isEmpty()) return emptyList()
-
-        val nonRecurring = database.eventOccurrencesDao()
-            .selectNonRecurringBetweenInclusive(userId, visibleCalendarIds, fromEpoch, toEpoch)
-            .firstOrNull().orEmpty()
-        val finiteRecurring = database.eventOccurrencesDao()
-            .selectFiniteRecurring(userId, visibleCalendarIds, fromEpoch, toEpoch)
-            .firstOrNull().orEmpty()
-        val infiniteRecurringRaw = database.eventOccurrencesDao()
-            .selectInfiniteRecurring(userId, visibleCalendarIds, toEpoch)
-            .firstOrNull().orEmpty()
 
         val notOccurring = infiniteRecurringRaw.filter { occ ->
             val isSelectedWindowFullyInOccurrenceWindow =
@@ -147,7 +212,6 @@ class MetadataIndicatorsCalculator @Inject constructor(
         val byUid = allRows.groupBy { it.eventUid }
 
         // per-event color overrides
-        val isFreeUser = !(getUserInfoUseCase().firstOrNull()?.hasSubscriptionForMail ?: false)
         val eventColorById: Map<String, String?> = if (isFreeUser) {
             emptyMap()
         } else {
@@ -278,7 +342,8 @@ class MetadataIndicatorsCalculator @Inject constructor(
         color: String,
         indicators: MutableMap<LocalDate, MutableList<String>>,
     ) {
-        val zone = ZoneId.of(timeZoneId)
+        // all-day events are stored at UTC midnight; read their day in UTC so the display tz can't shift it
+        val zone = if (isAllDay) ZoneOffset.UTC else ZoneId.of(timeZoneId)
         val startLocal = startInstant.atZone(zone)
         val endLocal = endInstant.atZone(zone)
         val partTimeEndsOnMidnight = !isAllDay && endLocal.toLocalTime() == LocalTime.MIDNIGHT
@@ -325,7 +390,18 @@ class MetadataIndicatorsCalculator @Inject constructor(
 
         val dummy = generateDummyEvent(startLocal, endLocal, rrule, expansionZone, fullDay) ?: return null
         val occurrences = dummy.generateOccurrencesUntil(toDate, formatTimeZoneId) ?: return null
-        return occurrences.map { ExpandedOccurrence(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
+        return occurrences.map { occ ->
+            if (fullDay) {
+                // all-day occurrences come back at display-tz midnight; re-anchor to UTC midnight like the stored rows
+                ExpandedOccurrence(
+                    occ.startDateTime.toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant(),
+                    occ.endDateTime.toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant(),
+                    occ.occurrenceNumber,
+                )
+            } else {
+                ExpandedOccurrence(occ.startDateTime.toInstant(), occ.endDateTime.toInstant(), occ.occurrenceNumber)
+            }
+        }
     }
 
     private fun generateDummyEvent(

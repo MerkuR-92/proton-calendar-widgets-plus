@@ -41,6 +41,32 @@ class EventChipsFactoryTest {
     }
 
     @Test
+    fun `all-day event from midnight to next midnight occupies a single day`() {
+        val event = MockFactory.resolvedWeekViewEntity(
+            startTime = today().withHour(0),
+            endTime = today().plusDays(1).withHour(0),
+            isAllDay = true,
+        )
+
+        val chips = factory.create(listOf(event), viewState)
+
+        assertThat(chips).hasSize(1)
+    }
+
+    @Test
+    fun `all-day event shifted off midnight bleeds into a second day`() {
+        val event = MockFactory.resolvedWeekViewEntity(
+            startTime = today().withHour(23),
+            endTime = today().plusDays(1).withHour(23),
+            isAllDay = true,
+        )
+
+        val chips = factory.create(listOf(event), viewState)
+
+        assertThat(chips).hasSize(2)
+    }
+
+    @Test
     fun `empty event list returns empty chips`() {
         val result = factory.create(emptyList(), viewState)
         assertThat(result).isEmpty()

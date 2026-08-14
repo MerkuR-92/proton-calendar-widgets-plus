@@ -98,6 +98,7 @@ import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.DispatcherProvider
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 import me.proton.core.util.kotlin.toInt
@@ -133,6 +134,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
     private val getFetchedEventWindowsValidity: GetFetchedEventWindowsValidity,
     private val refreshDeletedEventsUseCase: RefreshDeletedEventsUseCase,
+    private val dispatcherProvider: DispatcherProvider,
 ) : CalendarsRepository {
 
     override val fetchingState =
@@ -150,7 +152,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var maxRequestedWindowToFetch: FetchWindow? = null
 
-    private var scopeEventFetching = CoroutineScope(Dispatchers.Default)
+    private var scopeEventFetching = CoroutineScope(dispatcherProvider.Comp)
 
     private val displayServerDownBannerFlow = MutableStateFlow(false)
     private var lastPingMs: Long = 0L
@@ -259,7 +261,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun shutdown() {
         // cancel any ongoing Event fetching
         scopeEventFetching.cancel()
-        scopeEventFetching = CoroutineScope(Dispatchers.Default)
+        scopeEventFetching = CoroutineScope(dispatcherProvider.Comp)
 
         minRequestedWindowToFetch = null
         maxRequestedWindowToFetch = null

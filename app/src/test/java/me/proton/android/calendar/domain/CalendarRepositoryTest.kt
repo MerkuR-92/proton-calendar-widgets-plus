@@ -19,6 +19,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import me.proton.core.test.kotlin.TestDispatcherProvider
+import me.proton.core.util.kotlin.DefaultDispatcherProvider
+import me.proton.core.util.kotlin.DispatcherProvider
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -817,9 +823,10 @@ internal class CalendarRepositoryTest {
     }
 
     @Test
-    fun `non-forced fetch refetches when window validity fails`() = runBlocking {
+    fun `non-forced fetch refetches when window validity fails`() = runTest {
         // Given
-        val repo = getCalendarRepository() as CalendarsRepositoryImpl
+        // fetching runs on its own scope; drive it on the test scheduler so it completes before we verify
+        val repo = getCalendarRepository(TestDispatcherProvider(StandardTestDispatcher(testScheduler))) as CalendarsRepositoryImpl
         val tz = "UTC"
         val from = LocalDate.of(2025, 2, 1)
         val to = LocalDate.of(2025, 2, 28)
@@ -853,6 +860,9 @@ internal class CalendarRepositoryTest {
 
         // non-forced should refetch
         repo.fetchEvents(userId, from, to, tz, force = false)
+
+        // let the fetching scope drain both queued windows
+        advanceUntilIdle()
 
         coVerify(exactly = 2) {
             fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
@@ -1036,7 +1046,9 @@ internal class CalendarRepositoryTest {
 
     private fun toIcsDate(d: LocalDate) = String.format("%04d%02d%02d", d.year, d.monthValue, d.dayOfMonth)
 
-    private fun getCalendarRepository(): CalendarsRepository {
+    private fun getCalendarRepository(
+        dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
+    ): CalendarsRepository {
         return CalendarsRepositoryImpl(
             database = appDatabaseMock,
             transformEventUseCase = transformEventUseCaseMock,
@@ -1058,6 +1070,7 @@ internal class CalendarRepositoryTest {
             updateFetchedEventsMetadataUseCase = updateFetchedEventsMetadataUseCaseMock,
             getFetchedEventWindowsValidity = getFetchedEventWindowsValidity,
             refreshDeletedEventsUseCase = refreshDeletedEventsUseCase,
+            dispatcherProvider = dispatcherProvider,
         )
     }
 
