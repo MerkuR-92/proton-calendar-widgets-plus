@@ -47,6 +47,7 @@ val localProperties = Properties().apply {
 
 ksp {
     arg("room.generateKotlin", "false")
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 android {
@@ -182,7 +183,8 @@ android {
 
     sourceSets {
         getByName("androidTest").java.srcDirs("src/uiTest/java", "src/androidTest/java")
-        getByName("androidTest").assets.srcDirs("src/uiTest/assets")
+        // MigrationTestHelper reads schemas from assets
+        getByName("androidTest").assets.srcDirs("src/uiTest/assets", "$projectDir/schemas")
     }
 }
 
@@ -293,6 +295,7 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.compiler)
     kapt(libs.androidx.hilt.compiler)
+    kaptAndroidTest(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.navigation.ui)
     implementation(libs.androidx.navigation.fragment)
@@ -326,6 +329,7 @@ dependencies {
     testImplementation(project(":shared-test-code"))
     testImplementation(libs.cash.turbine)
 
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.test.mockk.android)
     androidTestImplementation(libs.test.androidx.core)
     androidTestImplementation(libs.test.androidx.testrunner)

@@ -85,7 +85,7 @@ class UpdateAlarmsUseCase @Inject constructor(
             }
 
             transformedChain.forEach { event ->
-                database.eventAlarmsDao().deleteAllByEventId(event.id)
+                database.eventAlarmsDao().deleteAllByEventId(eventId = event.id, calendarId = event.calendar.id)
             }
 
             safePersistEventAlarmUseCase.invoke(upcomingAlarms)

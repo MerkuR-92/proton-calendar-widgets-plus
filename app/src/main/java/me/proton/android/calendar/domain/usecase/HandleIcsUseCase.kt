@@ -35,6 +35,7 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.key
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.domain.entity.UserId
@@ -153,7 +154,12 @@ class HandleIcsUseCase @Inject constructor(
 
         if (immutableExistingEvent != null && immutableExistingEvent == newEvent) {
             // Event already exists
-            return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
+            return IcsSurgeryUtils.HandleIcsResult.Success(
+                eventId = immutableExistingEvent.id,
+                calendarId = immutableExistingEvent.calendar.id,
+                action = IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT,
+                isRecurring = immutableExistingEvent.isRecurring()
+            )
         } else {
             when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent, isImport = true)) {
                 is UseCase.Result.Success<*> -> {
@@ -167,10 +173,15 @@ class HandleIcsUseCase @Inject constructor(
                     if (immutableExistingEvent != null) {
                         // If event with same UID existed and sync call succeeded, delete existing event locally since we overwrite on import
                         calendarsRepository.deleteEventsById(immutableExistingEvent.calendar.id, listOf(immutableExistingEvent.id))
-                        calendarsRepository.deleteEventsMetadataByEventIds(listOf(immutableExistingEvent.id))
+                        calendarsRepository.deleteEventsMetadataByEventIds(immutableExistingEvent.calendar.id, listOf(immutableExistingEvent.id))
                     }
 
-                    return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(), IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, isRecurring = newEvent.isRecurring())
+                    return IcsSurgeryUtils.HandleIcsResult.Success(
+                        eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(),
+                        calendarId = newEvent.calendar.id,
+                        action = IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
+                        isRecurring = newEvent.isRecurring()
+                    )
                 }
                 is UseCase.Result.InvalidParams -> {
                     logger.i("HandleIcsUseCase: invalid params in create event: ${editCreateEventResult.message}")
@@ -375,18 +386,23 @@ class HandleIcsUseCase @Inject constructor(
         if (iCalendar.method.isReply && isOrganizerMode && canonicalSenderEmail.isNotBlank() && attendees != null &&
             attendees.find {
                 canonicalizeProtonEmail(it.extractEmail() ?: "", forceCanonicalization = true).equals(canonicalSenderEmail)
-            } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(immutableExistingEvent.id)
+            } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(immutableExistingEvent.key)
 
         if (iCalendar.method.isReply && !isOrganizerMode) {
-            return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
+            return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.key)
         }
-        if (existingEvent?.decryptionStatus is Event.DecryptionStatus.Failure) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.calendar?.id, existingEvent?.isRecurring())
-        if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
+        if (existingEvent?.decryptionStatus is Event.DecryptionStatus.Failure) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(key = existingEvent?.key, isRecurring = existingEvent?.isRecurring())
+        if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.key)
 
-        if (isCurrentUserSender && existingEvent != null) {
+        if (isCurrentUserSender && immutableExistingEvent != null) {
             // We are opening an invite sent by the current user, no changes are needed, open event details
-            existingEvent?.let { makeCalendarVisible(it, userId) }
-            return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
+            makeCalendarVisible(immutableExistingEvent, userId)
+            return IcsSurgeryUtils.HandleIcsResult.Success(
+                eventId = immutableExistingEvent.id,
+                calendarId = immutableExistingEvent.calendar.id,
+                action = IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT,
+                isRecurring = immutableExistingEvent.isRecurring()
+            )
         }
 
         val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus is Event.DecryptionStatus.Failure)
@@ -398,8 +414,7 @@ class HandleIcsUseCase @Inject constructor(
 
             if (existingCalendarEntity?.isActive == false) {
                 // If calendar is disabled, display error message and try to open event details
-                return if (existingEvent != null) IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
-                else IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(null)
+                return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.key)
             }
 
             existingCalendarEntity
@@ -468,7 +483,12 @@ class HandleIcsUseCase @Inject constructor(
                     // Event is a proton to proton invite
                     // Fetch event to make sure we have the latest version
                     makeCalendarVisible(immutableExistingEvent, userId)
-                    return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
+                    return IcsSurgeryUtils.HandleIcsResult.Success(
+                        eventId = immutableExistingEvent.id,
+                        calendarId = immutableExistingEvent.calendar.id,
+                        action = IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT,
+                        isRecurring = immutableExistingEvent.isRecurring()
+                    )
                 }
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId, isOrganizerMode)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, canonicalUserEmails, userAttendee, userId)
@@ -477,7 +497,12 @@ class HandleIcsUseCase @Inject constructor(
                     // Attendee added the event as a Proton to Proton invite
                     // Fetch event to make sure we have the latest version
                     makeCalendarVisible(immutableExistingEvent, userId)
-                    return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
+                    return IcsSurgeryUtils.HandleIcsResult.Success(
+                        eventId = immutableExistingEvent.id,
+                        calendarId = immutableExistingEvent.calendar.id,
+                        action = IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT,
+                        isRecurring = immutableExistingEvent.isRecurring()
+                    )
                 }
                 return updateEventAsAnOrganizer(immutableExistingEvent, immutableExistingEventEntity, iCalendar, userId)
             } else if (isOrganizerMode && immutableExistingEvent == null) {
@@ -491,7 +516,12 @@ class HandleIcsUseCase @Inject constructor(
         }
 
         // If no update is needed, return the existing event id
-        return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
+        return IcsSurgeryUtils.HandleIcsResult.Success(
+            eventId = immutableExistingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound,
+            calendarId = immutableExistingEvent.calendar.id,
+            action = IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT,
+            isRecurring = immutableExistingEvent.isRecurring()
+        )
     }
 
     private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId, isOrganizerMode: Boolean): Boolean {
@@ -575,7 +605,7 @@ class HandleIcsUseCase @Inject constructor(
 
         if (existingEvent.iCalEvent.attendees?.none {
                 canonicalAttendeeEmail == existingEventCanonicalAttendeeEmails[it.extractEmail()]
-            } == true) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
+            } == true) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.key)
 
 
         val isRsvpCommentsEnabled = featureFlagManager.getOrDefault(
@@ -633,8 +663,9 @@ class HandleIcsUseCase @Inject constructor(
 
                     return IcsSurgeryUtils.HandleIcsResult.Success(
                         eventId = existingEvent.id,
-                        IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT,
-                        Pair(updatedAttendeeEmail, updatedAttendee.participationStatus),
+                        calendarId = existingEvent.calendar.id,
+                        action = IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT,
+                        newAttendeeStatus = Pair(updatedAttendeeEmail, updatedAttendee.participationStatus),
                         isRecurring = existingEvent.isRecurring()
                     )
                 }
@@ -642,7 +673,12 @@ class HandleIcsUseCase @Inject constructor(
         }
 
         makeCalendarVisible(existingEvent, userId)
-        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent.isRecurring())
+        return IcsSurgeryUtils.HandleIcsResult.Success(
+            eventId = existingEvent.id,
+            calendarId = existingEvent.calendar.id,
+            action = IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT,
+            isRecurring = existingEvent.isRecurring()
+        )
     }
 
     private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
@@ -657,7 +693,12 @@ class HandleIcsUseCase @Inject constructor(
 
                 makeCalendarVisible(newEvent, userId)
 
-                return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(), action, isRecurring = newEvent.isRecurring())
+                return IcsSurgeryUtils.HandleIcsResult.Success(
+                    eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(),
+                    calendarId = newEvent.calendar.id,
+                    action = action,
+                    isRecurring = newEvent.isRecurring()
+                )
             }
             is UseCase.Result.InvalidParams -> {
                 logger.i("HandleIcsUseCase: invalid params in create event: ${editCreateEventResult.message}")

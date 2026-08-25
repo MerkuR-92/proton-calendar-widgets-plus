@@ -65,6 +65,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.key
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -81,6 +82,7 @@ import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.indicators.FastWindowExpansion
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
@@ -745,7 +747,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun shouldFetchEvent(userId: UserId, metadata: EventEntityMetadata): Boolean {
-        val dbEventEntity = database.eventsDao().selectById(metadata.id)
+        val dbEventEntity = database.eventsDao().selectEvent(eventId = metadata.id, calendarId = metadata.calendarId)
         val isDbEventUpToDate = dbEventEntity?.modifyTime == metadata.modifyTime
         if (isDbEventUpToDate) return false
 
@@ -848,12 +850,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun selectEventEntity(eventId: String): EventEntity? =
-        database.eventsDao().selectById(eventId)
+    override suspend fun selectEventEntity(key: EventKey): EventEntity? =
+        database.eventsDao().selectEvent(key.eventId, key.calendarId)
 
-    override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
+    override suspend fun selectRootEventEntity(eventUid: String, calendarId: String): EventEntity? {
         val formattedUid = formatUidForICal(eventUid)
-        return database.eventsDao().selectByUid(formattedUid).find { eventEntity ->
+        return database.eventsDao().selectByUidInCalendar(formattedUid, calendarId).find { eventEntity ->
             eventEntity.sharedEvents.any {
                 try {
                     // only root event contains RRULE
@@ -959,17 +961,17 @@ class CalendarsRepositoryImpl @Inject constructor(
         if (uids.isEmpty()) return emptyMap()
         val uidSet = uids.toSet()
 
-        // resolve uids via the indexed eventUid column then load events by id instead of the slow sharedEvents LIKE scan
+        // resolve uids via the indexed eventUid column then load events by key instead of the slow sharedEvents LIKE scan
         val refs = uidSet.chunked(SQL_IN_VARIABLE_BATCH).flatMap {
             database.eventOccurrencesDao().selectEventRefsByUids(it.toSet())
         }
-        val eventsById = refs.map { it.eventId }.toSet()
+        val eventsByKey = refs.map { it.eventId }.toSet()
             .chunked(SQL_IN_VARIABLE_BATCH)
             .flatMap { database.eventsDao().selectByIdIn(it.toSet()) }
-            .associateBy { it.id }
-        val eventIdsByUid = refs.groupBy({ it.eventUid }, { it.eventId })
+            .associateBy { EventKey(it.id, it.calendarId) }
+        val keysByUid = refs.groupBy({ it.eventUid }, { it.key })
         val byUid = uidSet.associateWith { uid ->
-            eventIdsByUid[uid].orEmpty().distinct().mapNotNull { eventsById[it] }
+            keysByUid[uid].orEmpty().distinct().mapNotNull { eventsByKey[it] }
         }
 
         // fall back to the LIKE scan for any uid with no occurrence rows
@@ -985,8 +987,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return getEventWithCommentsUseCase.execute(userId, calendarId, eventId)
     }
 
-    override suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>) {
-        database.eventsMetadataDao().deleteByEventIds(eventIds)
+    override suspend fun deleteEventsMetadataByEventIds(calendarId: String, eventIds: List<String>) {
+        database.eventsMetadataDao().deleteByEventIds(calendarId, eventIds)
     }
 
     override suspend fun deleteEventsMetadataByCalendarId(calendarId: String) {
@@ -1032,7 +1034,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteEventsById(calendarId: String, ids: List<String>) {
-        database.eventsDao().deleteByIds(ids)
+        database.eventsDao().deleteByIds(calendarId, ids)
 
         database.calendarsDao().selectCalendarUserId(calendarId)?.let {
             deleteSearchEventsForEvents(it, calendarId, ids)
@@ -1255,14 +1257,6 @@ class CalendarsRepositoryImpl @Inject constructor(
         return calendarsApi.getEventAlarms(userId, calendarId, eventId)
     }
 
-    override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {
-        return database.eventAlarmsDao().selectByEventId(eventId)
-    }
-
-    override suspend fun selectEventAlarm(eventAlarmId: String): EventAlarmEntity? {
-        return database.eventAlarmsDao().select(eventAlarmId)
-    }
-
     override suspend fun deleteAllEventAlarmsByCalendar(calendarId: String) {
         database.eventAlarmsDao().deleteAllByCalendar(calendarId)
     }
@@ -1277,14 +1271,6 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun deleteEventAlarmById(id: String) {
         database.eventAlarmsDao().deleteById(id)
-    }
-
-    override suspend fun deleteEventAlarmsForEvent(eventId: String) {
-        database.eventAlarmsDao().deleteAllByEventId(eventId)
-    }
-
-    override suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long) {
-        database.eventAlarmsDao().deleteAllByEventIdAndOccurrence(eventId, occurrence)
     }
 
     override suspend fun getAddressForMember(
@@ -1456,15 +1442,15 @@ internal suspend fun fetchUidCandidates(
         val where = chunk.joinToString(" OR ") { "sharedEvents LIKE ?" }
         val args = chunk.map { "%$it%" }.toTypedArray()
         runQuery(SimpleSQLiteQuery("SELECT * FROM events WHERE $where", args))
-    }.distinctBy { it.id }
+    }.distinctBy { it.key }
 
 internal fun List<EventEntity>.attributeByUids(
     uids: Collection<String>,
 ): Map<String, List<EventEntity>> {
     if (uids.isEmpty()) return emptyMap()
-    val candidateText = associate { it.id to it.sharedEvents.joinToString("") { part -> part.toString() } }
+    val candidateText = associate { it.key to it.sharedEvents.joinToString("") { part -> part.toString() } }
     return uids.associateWith { eventUid ->
         val marker = uidMarker(eventUid)
-        filter { candidateText[it.id]?.contains(marker) ?: false }
+        filter { candidateText[it.key]?.contains(marker) ?: false }
     }
 }

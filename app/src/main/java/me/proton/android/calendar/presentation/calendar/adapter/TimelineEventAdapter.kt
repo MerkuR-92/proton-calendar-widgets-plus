@@ -140,6 +140,7 @@ class TimelineEventAdapter(
 
     data class TimelineEvent(
         val id: String,
+        val calendarId: String,
         val summary: String,
         val dateContent: String,
         val location: String,

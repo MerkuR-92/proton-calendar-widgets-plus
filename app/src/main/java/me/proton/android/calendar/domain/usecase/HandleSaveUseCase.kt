@@ -27,6 +27,8 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
+import me.proton.android.calendar.domain.model.key
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
@@ -79,7 +81,7 @@ class HandleSaveUseCase @Inject constructor(
             event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
         }
 
-        val eventEntity = calendarsRepository.selectEventEntity(event.id)
+        val eventEntity = calendarsRepository.selectEventEntity(event.key)
         val dbEvent = eventEntity?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(it)
         } else {
@@ -404,12 +406,12 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         // delete single edits starting with just edited occurrence / single edit
-        val eventId = if (dbEvent.isSingleEdit()) immutableOriginalDbEvent!!.id else event.id
+        val eventKey = if (dbEvent.isSingleEdit()) immutableOriginalDbEvent!!.key else event.key
         val deleteStartDate =
             if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(
                 1
             )
-        val deleteSingleEditsResult = handleDeleteUseCase.handleDeleteSingleEdits(userId, eventId, deleteStartDate)
+        val deleteSingleEditsResult = handleDeleteUseCase.handleDeleteSingleEdits(userId, eventKey, deleteStartDate)
         deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
         if (deleteSingleEditsResult is UseCase.Result.Error) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: failed to delete single edits: ${deleteSingleEditsResult.message}"))
@@ -556,9 +558,9 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         // delete all single edits
-        val originalEventId =
-            if (dbEvent?.isSingleEdit() == true) immutableOriginalDbEvent?.id
-            else event.id
+        val originalEventKey =
+            if (dbEvent?.isSingleEdit() == true) immutableOriginalDbEvent?.key
+            else event.key
         val originalEventStartDate =
             if (dbEvent?.isSingleEdit() == true) originalDbEventStartDate
             else dbEventStartDate
@@ -566,7 +568,7 @@ class HandleSaveUseCase @Inject constructor(
         if (originalEventStartDate == null) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: Edit all events: originalEventStartDate was null"))
         }
-        if (originalEventId == null) {
+        if (originalEventKey == null) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: Edit all events: originalEventId was null"))
         }
 
@@ -610,7 +612,7 @@ class HandleSaveUseCase @Inject constructor(
 
                 // TODO Remove duplicated code
                 val deleteSingleEditsResult =
-                    handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                    handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventKey, originalEventStartDate.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
                 if (deleteSingleEditsResult is UseCase.Result.Error) {
                     return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
@@ -661,7 +663,7 @@ class HandleSaveUseCase @Inject constructor(
 
                 // TODO Remove duplicated code
                 val deleteSingleEditsResult =
-                    handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                    handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventKey, originalEventStartDate.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
                 if (deleteSingleEditsResult is UseCase.Result.Error) {
                     return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
@@ -702,7 +704,7 @@ class HandleSaveUseCase @Inject constructor(
 
             // TODO Remove duplicated code
             val deleteSingleEditsResult =
-                handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventKey, originalEventStartDate.minusNanos(1))
             deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
             if (deleteSingleEditsResult is UseCase.Result.Error) {
                 return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
@@ -713,7 +715,7 @@ class HandleSaveUseCase @Inject constructor(
             if (dbEvent?.isSingleEdit() == true) {
 
                 // clear recurrenceId and use original event id since single edit will replace original event
-                val newEvent = Event.from(event, id = originalEventId)
+                val newEvent = Event.from(event, id = originalEventKey.eventId)
                 newEvent.iCalEvent.recurrenceId = null
                 newEvent.iCalEvent.exceptionDates.clear()
 

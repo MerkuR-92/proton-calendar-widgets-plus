@@ -25,6 +25,8 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
+import me.proton.android.calendar.domain.model.key
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
@@ -63,7 +65,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
         logger.v("executing HandleDeleteUseCase $userId, $eventId, $deleteOption, $occurrenceNumber $deleteSingleEdits $isOrphanSingleEdit")
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId)
+        val eventEntity = calendarsRepository.selectEventEntity(EventKey(eventId, calendarId))
 
         // maybe Event was deleted on server first
         if (eventEntity == null) {
@@ -93,7 +95,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 } else if (event.isSingleEdit()) {
 
                     if (!isOrphanSingleEdit) {
-                        val rootEventEntity = calendarsRepository.selectRootEventEntity(event.uid)
+                        val rootEventEntity = calendarsRepository.selectRootEventEntity(event.uid, event.calendar.id)
                         val rootEvent = rootEventEntity?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                             eventDecryptor.decrypt(it)
                         } else {
@@ -143,7 +145,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
                 val rootEvent =
-                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid, event.calendar.id)?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                         eventDecryptor.decrypt(it)
                     } else {
                         transformEventUseCase.execute(it)
@@ -171,7 +173,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 editResult.ifSuccessAndLogErrors(logger) {}
 
                 // delete single edits happening after this occurrence
-                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, occurrenceStart.minusNanos(1))
+                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.key, occurrenceStart.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
                 if ((editResult is UseCase.Result.Success<*>) && (deleteSingleEditsResult is UseCase.Result.Success<*>)) {
@@ -193,7 +195,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
                 // delete single edits and the original event as the last one
                 val rootEvent =
-                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid, event.calendar.id)?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                         eventDecryptor.decrypt(it)
                     } else {
                         transformEventUseCase.execute(it)
@@ -206,7 +208,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                     if (deleteSingleEdits) {
                         deleteSingleEditsAfter(
                             userId,
-                            rootEvent.id,
+                            rootEvent.key,
                             rootEvent.getStart(ZoneId.systemDefault().id)!!.minusNanos(1)
                         )
                     } else UseCase.Result.Success<Unit>()
@@ -259,7 +261,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 val successEventIds = eventIds.filterNot { it in errorEventIds }
                 if (successEventIds.isNotEmpty()) {
                     calendarsRepository.deleteEventsById(calendarId, successEventIds)
-                    calendarsRepository.deleteEventsMetadataByEventIds(successEventIds)
+                    calendarsRepository.deleteEventsMetadataByEventIds(calendarId, successEventIds)
                     handleAlarmsUseCase.execute(userId)
                 }
 
@@ -279,13 +281,14 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
     }
 
     // TODO maybe use UseCase.Params instead of overloaded methods
-    suspend fun handleDeleteSingleEdits(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
-        return deleteSingleEditsAfter(userId, eventId, recurrenceIdIsAfter)
+    suspend fun handleDeleteSingleEdits(userId: UserId, key: EventKey, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+        return deleteSingleEditsAfter(userId, key, recurrenceIdIsAfter)
     }
 
-    private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+    private suspend fun deleteSingleEditsAfter(userId: UserId, key: EventKey, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
+        val eventId = key.eventId
+        val eventEntity = calendarsRepository.selectEventEntity(key) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
         val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(eventEntity)
         } else {
@@ -309,8 +312,10 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         }
 
         // we need to manually delete all "single-edited" events with RecurrenceID after just-deleted occurrence
+        // only in this calendar - the uid chain spans calendars, but event ids are per-calendar
         val eventsToDelete = eventsSharingUid.filter {
-            it.iCalEvent.recurrenceId != null &&
+            it.calendar.id == event.calendar.id &&
+                    it.iCalEvent.recurrenceId != null &&
                     ZonedDateTime.ofInstant(it.iCalEvent.recurrenceId.value.toInstant(), ZoneId.systemDefault()).isAfter(recurrenceIdIsAfter)
         }
 
@@ -395,7 +400,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         if (!event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply) {
 
             val eventResponse = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
-                calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
+                calendarsRepository.fetchEventById(userId = userId, calendarId = event.calendar.id, eventId = event.id).valueOrNullAndLogErrors(logger)?.event
                     ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee fetchEventById event was null")
             } else null
 

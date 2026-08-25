@@ -12,11 +12,11 @@ import me.proton.android.calendar.data.db.AppDatabase
     tableName = AppDatabase.TABLE_EVENT_ALARMS,
     foreignKeys = [ForeignKey(
         entity = EventEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["eventId"],
+        parentColumns = ["id", "calendarId"],
+        childColumns = ["eventId", "calendarId"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index(value = ["eventId", "occurrence"])]
+    indices = [Index(value = ["eventId", "calendarId"]), Index(value = ["eventId", "occurrence"])]
 )
 @Serializable
 data class EventAlarmEntity(

@@ -171,12 +171,14 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         navigateToEditForm = {
                             findNavController().navigate((Navigation.Deeplink.toEventEdit(
                                 navigationArguments.eventId,
+                                navigationArguments.calendarId,
                                 navigationArguments.occurrenceNumber
                             )))
                         },
                         navigateToEditFormPersonal = {
                             findNavController().navigate((Navigation.Deeplink.toEventEditPersonal(
                                 navigationArguments.eventId,
+                                navigationArguments.calendarId,
                                 navigationArguments.occurrenceNumber
                             )))
                         }
@@ -270,10 +272,11 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         userId,
                         editMode = false,
                         meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
-                        navigationArguments.eventId,
-                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                        null,
-                        null
+                        eventId = navigationArguments.eventId,
+                        calendarId = navigationArguments.calendarId,
+                        occurrenceNumber = if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                        initStartDate = null,
+                        initStartTime = null
                     )
                 }
 

@@ -63,8 +63,9 @@ class CalendarEventListenerNew @Inject constructor(
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         if (keys.isEmpty()) return
-        calendarsRepository.deleteEventsMetadataByEventIds(keys)
-        calendarsRepository.deleteEventsById(config.asCalendar().calendarId, keys)
+        val calendarId = config.asCalendar().calendarId
+        calendarsRepository.deleteEventsMetadataByEventIds(calendarId, keys)
+        calendarsRepository.deleteEventsById(calendarId, keys)
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {

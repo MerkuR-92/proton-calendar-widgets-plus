@@ -58,19 +58,19 @@ class RefreshDeletedEventsUseCase @Inject constructor(
             database.inTransaction {
                 eventIdsToDelete.forEach { eventId ->
                     database.eventOccurrencesDao().deleteAllForEvent(userId.id, calendarId, eventId)
-                    database.eventAlarmsDao().deleteAllByEventId(eventId)
+                    database.eventAlarmsDao().deleteAllByEventId(eventId = eventId, calendarId = calendarId)
                 }
-                database.eventsDao().deleteByIds(eventIdsToDelete)
+                database.eventsDao().deleteByIds(calendarId, eventIdsToDelete)
                 deleteSearchEventsForEvents(userId.id, calendarId, eventIdsToDelete)
-                deleteEventsMetadataByEventIds(eventIdsToDelete)
+                deleteEventsMetadataByEventIds(calendarId, eventIdsToDelete)
             }
             logger.v("Manual refresh: deleted ${eventIdsToDelete.size} stale events in $calendarId.")
         }
         return UseCase.Result.Success(Unit)
     }
 
-    private suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>) {
-        database.eventsMetadataDao().deleteByEventIds(eventIds)
+    private suspend fun deleteEventsMetadataByEventIds(calendarId: String, eventIds: List<String>) {
+        database.eventsMetadataDao().deleteByEventIds(calendarId, eventIds)
     }
 
     private suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>) {

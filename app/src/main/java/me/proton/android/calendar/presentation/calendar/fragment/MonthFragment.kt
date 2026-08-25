@@ -939,8 +939,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         if (weekViewEvent.decrypted) {
             findNavController().navigate(
                 Navigation.Deeplink.toEventDetails(
-                    weekViewEvent.getActualEventId(),
-                    weekViewEvent.occurrenceNumber ?: 0
+                    eventId = weekViewEvent.getActualEventId(),
+                    calendarId = weekViewEvent.calendarId,
+                    occurrenceNumber = weekViewEvent.occurrenceNumber ?: 0
                 )
             )
         } else {

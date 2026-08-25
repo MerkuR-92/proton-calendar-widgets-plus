@@ -71,7 +71,7 @@ class ShowNotificationUseCase @Inject constructor(
 
         eventAlarms.forEach { eventAlarm ->
 
-            val eventEntity = database.eventsDao().selectById(eventAlarm.eventId)
+            val eventEntity = database.eventsDao().selectEvent(eventAlarm.eventId, eventAlarm.calendarId)
             if (eventEntity == null) {
                 logger.w("could not find EventEntity to show notification")
             } else {
@@ -110,9 +110,10 @@ class ShowNotificationUseCase @Inject constructor(
                     val notificationTag = (eventWithOccurrence ?: dbEvent).generateNotificationTag()
 
                     val intent = MainViewModel.createMainIntentToShowEventDetails(
-                        context,
-                        dbEvent.id,
-                        eventWithOccurrence?.occurrence?.occurrenceNumber
+                        context = context,
+                        eventId = dbEvent.id,
+                        calendarId = dbEvent.calendar.id,
+                        occurrenceNumber = eventWithOccurrence?.occurrence?.occurrenceNumber
                     )
 
                     val pendingIntent: PendingIntent =
@@ -197,7 +198,7 @@ class ShowNotificationUseCase @Inject constructor(
             if (nextEvent != null) { // maybe [currentOccurrence] was the last valid occurrence of this event
                 val alarmsForNextOccurrence = ICalUtilsImpl.calculateAlarmEntities(nextEvent, zoneId.id, "TODO").onlyDisplayType()
 
-                database.eventAlarmsDao().deleteAllByEventId(nextEvent.id)
+                database.eventAlarmsDao().deleteAllByEventId(eventId = nextEvent.id, calendarId = nextEvent.calendar.id)
 
                 logger.v("created next alarms for occurrence ${nextEvent.occurrence}:")
                 safePersistEventAlarmUseCase.invoke(alarmsForNextOccurrence)

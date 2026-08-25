@@ -4,6 +4,11 @@ import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.doesNotContain
+import assertk.assertions.isEmpty
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventApiResponse
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventResponse
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -85,6 +90,72 @@ class CalendarEventListenerTest {
             coVerify(exactly = 1) { calendarsRepository.deleteAllEvents(any()) }
         }
     }
+
+    @Test
+    fun `onCreate does not reuse an event fetched for another calendar`() {
+        runBlocking {
+            // singleton listener - its cache must be keyed by calendar, not just event id
+            val otherCalendar = "other-calendar"
+            val configB = EventManagerConfig.Calendar(userId, otherCalendar)
+            val metadataInA = createEventMetadata("1")
+            val metadataInB = createEventMetadata("1", paramCalendarId = otherCalendar)
+
+            coEvery { calendarsRepository.shouldFetchEvent(userId, metadataInA) } returns true
+            coEvery { calendarsRepository.shouldFetchEvent(userId, metadataInB) } returns false
+            coEvery { calendarsRepository.fetchEventById(userId, calendarId, "1") } returns
+                ApiResponse.Success(EventApiResponse(event = provideEventResponse().copy(id = "1")))
+            val persisted = capturePersistedEvents()
+
+            // calendar A fetches the event, then calendar B handles the same id without fetching
+            listener.onPrepare(config, listOf(metadataInA))
+            listener.onPrepare(configB, listOf(metadataInB))
+            listener.onCreate(configB, listOf(metadataInB))
+
+            assertThat(persisted.map { it.calendarId }).doesNotContain(calendarId)
+        }
+    }
+
+    @Test
+    fun `onComplete clears the fetched events for that calendar`() {
+        runBlocking {
+            val metadata = createEventMetadata("1")
+            coEvery { calendarsRepository.shouldFetchEvent(userId, metadata) } returns true
+            coEvery { calendarsRepository.fetchEventById(userId, calendarId, "1") } returns
+                ApiResponse.Success(EventApiResponse(event = provideEventResponse().copy(id = "1")))
+            val persisted = capturePersistedEvents()
+
+            listener.onPrepare(config, listOf(metadata))
+            listener.onComplete(config)
+            listener.onCreate(config, listOf(metadata))
+
+            assertThat(persisted).isEmpty()
+        }
+    }
+
+    @Test
+    fun `onCreate persists the fetched event`() {
+        runBlocking {
+            val metadata = createEventMetadata("1")
+            coEvery { calendarsRepository.shouldFetchEvent(userId, metadata) } returns true
+            coEvery { calendarsRepository.fetchEventById(userId, calendarId, "1") } returns
+                ApiResponse.Success(EventApiResponse(event = provideEventResponse().copy(id = "1")))
+            val persisted = capturePersistedEvents()
+
+            listener.onPrepare(config, listOf(metadata))
+            listener.onCreate(config, listOf(metadata))
+
+            assertThat(persisted.map { it.calendarId }).isEqualTo(listOf(calendarId))
+        }
+    }
+
+    private fun capturePersistedEvents(): List<EventEntity> {
+        val persisted = mutableListOf<EventEntity>()
+        coEvery { calendarsRepository.persistEvents(*anyVararg()) } answers {
+            persisted += firstArg<Array<EventEntity>>().toList()
+        }
+        return persisted
+    }
+
 }
 
 fun createEventEntity(id: String, modifyTime: Long? = null, paramCalendarId: String? = null, paramSharedKeyPacket: String? = null) = EventEntity(
@@ -111,10 +182,11 @@ fun createEventMetadata(
     startTime: Long? = null,
     endTime: Long? = null,
     modifyTime: Long? = null,
-    rRule: String? = null
+    rRule: String? = null,
+    paramCalendarId: String? = null
 ) = EventEntityMetadata(
     id = id,
-    calendarId = calendarId,
+    calendarId = paramCalendarId ?: calendarId,
     sharedEventId = sharedEventId,
     addressId = null,
     startTime = startTime ?: Instant.now().plusSeconds(3600).epochSecond,

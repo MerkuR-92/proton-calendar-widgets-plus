@@ -6,16 +6,17 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.model.EventKey
 
 @Entity(
     tableName = AppDatabase.TABLE_EVENTS_OCCURRENCES,
     foreignKeys = [ForeignKey(
         entity = EventEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["eventId"],
+        parentColumns = ["id", "calendarId"],
+        childColumns = ["eventId", "calendarId"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index(value = ["eventId"]), Index(value = ["eventUid"])]
+    indices = [Index(value = ["eventId", "calendarId"]), Index(value = ["eventUid"])]
 )
 @Serializable
 data class EventOccurrenceEntity(
@@ -41,6 +42,8 @@ data class EventOccurrenceEntity(
     @PrimaryKey(autoGenerate = true)
     var _id: Int = 0
 )
+
+val EventOccurrenceEntity.key get() = EventKey(eventId, calendarId)
 
 fun List<EventOccurrenceEntity>.distinct(): List<EventOccurrenceEntity> =
     this.distinctBy { (Triple(it.userId, it.calendarId, it.eventId)) }

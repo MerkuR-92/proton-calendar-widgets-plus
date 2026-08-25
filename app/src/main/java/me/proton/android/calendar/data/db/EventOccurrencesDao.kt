@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
+import me.proton.android.calendar.domain.model.EventKey
 
 @Dao
 abstract class EventOccurrencesDao : BaseDao<EventOccurrenceEntity> {
@@ -44,11 +45,11 @@ abstract class EventOccurrencesDao : BaseDao<EventOccurrenceEntity> {
         toSec: Long
     ): List<EventKey>
 
-    data class EventKey(val eventId: String, val calendarId: String)
-
-    // resolve event ids for uids via the indexed eventUid column
-    @Query("SELECT DISTINCT eventId, eventUid FROM events_occurrences WHERE eventUid IN (:uids)")
+    // resolve event keys for uids via the indexed eventUid column
+    @Query("SELECT DISTINCT eventId, calendarId, eventUid FROM events_occurrences WHERE eventUid IN (:uids)")
     abstract suspend fun selectEventRefsByUids(uids: Set<String>): List<EventUidRef>
 
-    data class EventUidRef(val eventId: String, val eventUid: String)
+    data class EventUidRef(val eventId: String, val calendarId: String, val eventUid: String) {
+        val key get() = EventKey(eventId, calendarId)
+    }
 }

@@ -16,10 +16,10 @@ object Navigation {
                         else "")
         }
         fun toLogin() = Uri.parse("proton-calendar://protonmail.com/login")
-        fun toEventDetails(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/details?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
-        fun toMainActivityWithEventId(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/main?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
-        fun toEventEdit(eventId: String? = null, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/edit?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
-        fun toEventEditPersonal(eventId: String? = null, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/editPersonal?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
+        fun toEventDetails(eventId: String, calendarId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/details?eventId=$eventId&calendarId=$calendarId&occurrenceNumber=${occurrenceNumber}")
+        fun toMainActivityWithEventId(eventId: String, calendarId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/main?eventId=$eventId&calendarId=$calendarId&occurrenceNumber=${occurrenceNumber}")
+        fun toEventEdit(eventId: String? = null, calendarId: String? = null, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/edit?eventId=$eventId&calendarId=$calendarId&occurrenceNumber=${occurrenceNumber}")
+        fun toEventEditPersonal(eventId: String? = null, calendarId: String? = null, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/editPersonal?eventId=$eventId&calendarId=$calendarId&occurrenceNumber=${occurrenceNumber}")
         fun toEventCreate(
             initStartDate: LocalDate,
             initStartTime: LocalTime? = null

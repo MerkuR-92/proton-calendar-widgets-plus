@@ -782,6 +782,7 @@ data class Event private constructor(
 
         return TimelineEventAdapter.TimelineEvent(
             id = this.id,
+            calendarId = this.calendar.id,
             summary = this.summary?.takeIfNotBlank() ?: resourceProvider.provideString(R.string.default_event_summary),
             dateContent = "${happensOn.dayOfWeek.formatShort()}, ${dateText}${if (locationText != null) " • " else ""}",
             location = locationText ?: "",

@@ -702,4 +702,46 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    // events now keyed on (id, calendarId); recreate the tables but keep the rows,
+    val MIGRATION_83_84 = object : Migration(83, 84) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // events: primary key is now (id, calendarId)
+            db.recreateTable(
+                table = TABLE_EVENTS,
+                createTable = { execSQL("CREATE TABLE IF NOT EXISTS `$TABLE_EVENTS` (`id` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `sharedEventId` TEXT, `calendarKeyPacket` TEXT, `createTime` INTEGER NOT NULL, `modifyTime` INTEGER NOT NULL, `permissions` INTEGER NOT NULL, `addressKeyPacket` TEXT, `addressId` TEXT, `sharedKeyPacket` TEXT, `sharedEvents` TEXT NOT NULL, `calendarEvents` TEXT NOT NULL, `attendeesEvents` TEXT NOT NULL, `attendees` TEXT NOT NULL, `attendeesInfo` TEXT, `isProtonProtonInvite` INTEGER, `notifications` TEXT, `color` TEXT, PRIMARY KEY(`id`, `calendarId`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )") },
+                createIndices = { execSQL("CREATE INDEX IF NOT EXISTS `index_events_calendarId` ON `$TABLE_EVENTS` (`calendarId`)") },
+            )
+            // events_metadata: primary key is now (id, calendarId)
+            db.recreateTable(
+                table = TABLE_EVENTS_METADATA,
+                createTable = { execSQL("CREATE TABLE IF NOT EXISTS `$TABLE_EVENTS_METADATA` (`id` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `sharedEventId` TEXT NOT NULL, `addressId` TEXT, `startTime` INTEGER NOT NULL, `startTimeZone` TEXT NOT NULL, `endTime` INTEGER NOT NULL, `endTimeZone` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `uid` TEXT NOT NULL, `recurrenceID` INTEGER, `exDates` TEXT NOT NULL, `rRule` TEXT, `createTime` INTEGER NOT NULL, `modifyTime` INTEGER NOT NULL, `isOrganizer` INTEGER NOT NULL, `sharedKeyPacket` TEXT, `calendarKeyPacket` TEXT, `addressKeyPacket` TEXT, `isPersonalSingleEdit` INTEGER NOT NULL, PRIMARY KEY(`id`, `calendarId`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )") },
+                createIndices = { execSQL("CREATE INDEX IF NOT EXISTS `index_events_metadata_calendarId` ON `$TABLE_EVENTS_METADATA` (`calendarId`)") },
+            )
+
+            // these point at an event in another calendar, so they have no parent anymore
+            db.execSQL("DELETE FROM `$TABLE_EVENTS_OCCURRENCES` WHERE NOT EXISTS (SELECT 1 FROM `$TABLE_EVENTS` WHERE `$TABLE_EVENTS`.`id` = `$TABLE_EVENTS_OCCURRENCES`.`eventId` AND `$TABLE_EVENTS`.`calendarId` = `$TABLE_EVENTS_OCCURRENCES`.`calendarId`)")
+            db.execSQL("DELETE FROM `$TABLE_EVENT_ALARMS` WHERE NOT EXISTS (SELECT 1 FROM `$TABLE_EVENTS` WHERE `$TABLE_EVENTS`.`id` = `$TABLE_EVENT_ALARMS`.`eventId` AND `$TABLE_EVENTS`.`calendarId` = `$TABLE_EVENT_ALARMS`.`calendarId`)")
+
+            // events_occurrences: foreign key now points at (eventId, calendarId)
+            db.recreateTable(
+                table = TABLE_EVENTS_OCCURRENCES,
+                createTable = { execSQL("CREATE TABLE IF NOT EXISTS `$TABLE_EVENTS_OCCURRENCES` (`userId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `eventId` TEXT NOT NULL, `eventUid` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `startTime` INTEGER, `endTime` INTEGER, `windowStartTime` INTEGER NOT NULL, `windowEndTime` INTEGER NOT NULL, `firstOccurrenceStartTime` INTEGER NOT NULL, `lastOccurrenceEndTime` INTEGER, `rRule` TEXT, `modifyTime` INTEGER NOT NULL, `startTimeZone` TEXT NOT NULL, `endTimeZone` TEXT NOT NULL, `exDates` TEXT NOT NULL, `recurrenceID` INTEGER, `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`eventId`, `calendarId`) REFERENCES `events`(`id`, `calendarId`) ON UPDATE NO ACTION ON DELETE CASCADE )") },
+                createIndices = {
+                    execSQL("CREATE INDEX IF NOT EXISTS `index_events_occurrences_eventId_calendarId` ON `$TABLE_EVENTS_OCCURRENCES` (`eventId`, `calendarId`)")
+                    execSQL("CREATE INDEX IF NOT EXISTS `index_events_occurrences_eventUid` ON `$TABLE_EVENTS_OCCURRENCES` (`eventUid`)")
+                },
+            )
+            // event_alarms: foreign key now points at (eventId, calendarId)
+            db.recreateTable(
+                table = TABLE_EVENT_ALARMS,
+                createTable = { execSQL("CREATE TABLE IF NOT EXISTS `$TABLE_EVENT_ALARMS` (`id` TEXT NOT NULL, `occurrence` INTEGER NOT NULL, `trigger` TEXT NOT NULL, `action` INTEGER NOT NULL, `eventId` TEXT NOT NULL, `memberId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`eventId`, `calendarId`) REFERENCES `events`(`id`, `calendarId`) ON UPDATE NO ACTION ON DELETE CASCADE )") },
+                createIndices = {
+                    execSQL("CREATE INDEX IF NOT EXISTS `index_event_alarms_eventId_calendarId` ON `$TABLE_EVENT_ALARMS` (`eventId`, `calendarId`)")
+                    execSQL("CREATE INDEX IF NOT EXISTS `index_event_alarms_eventId_occurrence` ON `$TABLE_EVENT_ALARMS` (`eventId`, `occurrence`)")
+                },
+            )
+        }
+    }
+
 }

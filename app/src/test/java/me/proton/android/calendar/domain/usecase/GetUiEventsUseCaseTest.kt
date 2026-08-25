@@ -156,7 +156,7 @@ class GetUiEventsUseCaseTest {
         )
 
         coEvery { decryptor.getFromCache("e1", calendarId, any()) } returns null
-        coEvery { eventsDao.selectById("e1") } returns mockk(relaxed = true)
+        coEvery { eventsDao.selectEvent("e1", calendarId) } returns mockk(relaxed = true)
         coEvery { decryptor.decrypt(any()) } returns createEvent("e1", "uid1", tz, start, end, isSingleEdit = false)
 
         every {
@@ -173,7 +173,7 @@ class GetUiEventsUseCaseTest {
             coVerifyOrder {
                 decryptor.setCalendars(any())
                 decryptor.getFromCache("e1", calendarId, any())
-                eventsDao.selectById("e1")
+                eventsDao.selectEvent("e1", calendarId)
                 decryptor.decrypt(any())
             }
             cancelAndIgnoreRemainingEvents()

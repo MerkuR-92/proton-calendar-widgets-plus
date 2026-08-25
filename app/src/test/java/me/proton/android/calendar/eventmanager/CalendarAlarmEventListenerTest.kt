@@ -3,6 +3,10 @@ package me.proton.android.calendar.eventmanager
 import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isFalse
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import io.mockk.verify
+import me.proton.android.calendar.common.worker.HandleAlarmsWithMissingEventWorker
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -124,15 +128,55 @@ class CalendarAlarmEventListenerTest {
         }
     }
 
-    private fun createAlarmEntity(id: String, occurrence: Instant = Instant.now()) = EventAlarmEntity(
+    private fun createAlarmEntity(
+        id: String,
+        occurrence: Instant = Instant.now(),
+        paramCalendarId: String? = null,
+        paramEventId: String? = null
+    ) = EventAlarmEntity(
         id,
         occurrence.epochSecond,
         "",
         0,
-        eventId,
+        paramEventId ?: eventId,
         memberId,
-        calendarId
+        paramCalendarId ?: calendarId
     )
+
+
+    @Test
+    fun `alarms with missing event are fetched against their own calendar`() {
+        runBlocking {
+            // an alarm seen in one calendar's loop must not be refetched with another calendar's id
+            mockkObject(HandleAlarmsWithMissingEventWorker)
+            val otherCalendar = "other-calendar"
+            val configB = EventManagerConfig.Calendar(userId, otherCalendar)
+            coEvery { calendarsRepository.hasEvent(any(), any()) } returns false
+
+            listener.onCreateOrUpdate(config, listOf(createAlarmEntity("alarm_1", paramEventId = "event-a")))
+            listener.onComplete(config)
+            listener.onCreateOrUpdate(
+                configB,
+                listOf(createAlarmEntity("alarm_2", paramCalendarId = otherCalendar, paramEventId = "event-b"))
+            )
+            // onSuccess needs a populated action map, same as in the real loop
+            listener.notifySuccess(
+                configB,
+                EventMetadata(userId = userId, eventId = EventId("eventId"), config = configB, createdAt = 0L),
+                EventsResponse(eventsResponse)
+            )
+
+            // event-b genuinely belongs to the calendar being synced
+            verify(exactly = 1) {
+                HandleAlarmsWithMissingEventWorker.enqueue(any(), userId.id, otherCalendar, "event-b")
+            }
+            // event-a is from the previous cycle - must not be re-enqueued at all
+            verify(exactly = 0) {
+                HandleAlarmsWithMissingEventWorker.enqueue(any(), any(), any(), "event-a")
+            }
+            unmockkObject(HandleAlarmsWithMissingEventWorker)
+        }
+    }
 
 }
 

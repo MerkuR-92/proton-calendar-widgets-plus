@@ -3,15 +3,17 @@ package me.proton.android.calendar.data.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.model.EventKey
 
+// EventID is only unique within a shard, so (id, calendarId) is the key
 @Entity(
     tableName = AppDatabase.TABLE_EVENTS,
+    primaryKeys = ["id", "calendarId"],
     foreignKeys = [ForeignKey(
         entity = CalendarEntity::class,
         parentColumns = ["id"],
@@ -23,7 +25,6 @@ import me.proton.android.calendar.data.db.AppDatabase
 @Serializable
 data class EventEntity(
     @SerialName("ID")
-    @PrimaryKey
     val id: String,
     @SerialName("CalendarID")
     val calendarId: String,
@@ -63,6 +64,8 @@ data class EventEntity(
     @SerialName("Color")
     val color: String? = null
 )
+
+val EventEntity.key get() = EventKey(id, calendarId)
 
 fun EventResponse.toEventEntity(): EventEntity {
     return EventEntity(

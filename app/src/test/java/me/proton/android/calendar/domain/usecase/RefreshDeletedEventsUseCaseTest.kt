@@ -18,6 +18,7 @@ import me.proton.android.calendar.data.db.EventsDao
 import me.proton.android.calendar.data.db.EventsMetadataDao
 import me.proton.android.calendar.data.db.SearchDao
 import me.proton.android.calendar.data.db.SearchDatabase
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.core.domain.entity.UserId
@@ -96,9 +97,9 @@ class RefreshDeletedEventsUseCaseTest {
                 any(),
             )
         }
-        coVerify(exactly = 0) { eventsDao.deleteByIds(any()) }
-        coVerify(exactly = 0) { alarmsDao.deleteAllByEventId(any()) }
-        coVerify(exactly = 0) { metadataDao.deleteByEventIds(any()) }
+        coVerify(exactly = 0) { eventsDao.deleteByIds(any(), any()) }
+        coVerify(exactly = 0) { alarmsDao.deleteAllByEventId(any(), any()) }
+        coVerify(exactly = 0) { metadataDao.deleteByEventIds(any(), any()) }
         coVerify(exactly = 0) { searchDao.deleteSearchEventsForEvents(any(), any(), any()) }
         assert(res is UseCase.Result.Success<*>)
     }
@@ -112,12 +113,12 @@ class RefreshDeletedEventsUseCaseTest {
             // locally we have e1 in window; but we fetch only e2 - e1 should be deleted
             coEvery {
                 occurrencesDao.selectEventKeysOverlapping("u1", listOf("c1"), any(), any())
-            } returns listOf(EventOccurrencesDao.EventKey(eventId = "e1", calendarId = "c1"))
+            } returns listOf(EventKey(eventId = "e1", calendarId = "c1"))
 
-            coEvery { alarmsDao.deleteAllByEventId(any()) } just Runs
+            coEvery { alarmsDao.deleteAllByEventId(any(), any()) } just Runs
             coEvery { occurrencesDao.deleteAllForEvent(any(), any(), any()) } just Runs
-            coEvery { eventsDao.deleteByIds(any()) } just Runs
-            coEvery { metadataDao.deleteByEventIds(any()) } just Runs
+            coEvery { eventsDao.deleteByIds(any(), any()) } just Runs
+            coEvery { metadataDao.deleteByEventIds(any(), any()) } just Runs
             coEvery { searchDao.deleteSearchEventsForEvents(any(), any(), any()) } returns -1
             // When
             val res = sut().execute(
@@ -131,8 +132,8 @@ class RefreshDeletedEventsUseCaseTest {
             // Then
             coVerify { occurrencesDao.selectEventKeysOverlapping("u1", listOf("c1"), any(), any()) }
             coVerify { occurrencesDao.deleteAllForEvent("u1", "c1", "e1") }
-            coVerify { alarmsDao.deleteAllByEventId("e1") }
-            coVerify { eventsDao.deleteByIds(match { it == listOf("e1") }) }
+            coVerify { alarmsDao.deleteAllByEventId("e1", "c1") }
+            coVerify { eventsDao.deleteByIds("c1", match { it == listOf("e1") }) }
             coVerify {
                 searchDao.deleteSearchEventsForEvents(
                     userId = "u1",
@@ -140,7 +141,7 @@ class RefreshDeletedEventsUseCaseTest {
                     eventIds = match { it == listOf("e1") },
                 )
             }
-            coVerify { metadataDao.deleteByEventIds(match { it == listOf("e1") }) }
+            coVerify { metadataDao.deleteByEventIds("c1", match { it == listOf("e1") }) }
             assert(res is UseCase.Result.Success<*>)
         }
 

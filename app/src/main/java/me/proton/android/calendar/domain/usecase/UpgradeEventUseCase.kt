@@ -13,6 +13,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.decryptSessionKey
@@ -37,9 +38,9 @@ class UpgradeEventUseCase @Inject constructor(
     private val fetchEventWithCommentsUseCase: GetEventWithCommentsUseCase
 ) : UseCase {
 
-    suspend fun execute(userId: UserId, eventId: String): UseCase.Result {
+    suspend fun execute(userId: UserId, key: EventKey): UseCase.Result {
 
-        val eventEntity = database.eventsDao().selectById(eventId)
+        val eventEntity = database.eventsDao().selectEvent(key.eventId, key.calendarId)
             ?: return UseCase.Result.InvalidParams("UpgradeEventUseCase: could not get EventEntity from DB")
 
         if (eventEntity.sharedKeyPacket != null) return UseCase.Result.Success(eventEntity)

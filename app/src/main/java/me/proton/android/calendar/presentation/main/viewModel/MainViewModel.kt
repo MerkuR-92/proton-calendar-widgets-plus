@@ -262,10 +262,10 @@ class MainViewModel @Inject constructor(
         const val INTENT_ACTION_SHOW_DAY = "INTENT_ACTION_SHOW_DAY"
         const val INTENT_ACTION_NEW_EVENT = "INTENT_ACTION_NEW_EVENT"
 
-        fun createMainIntentToShowEventDetails(context: Context, eventId: String, occurrenceNumber: Int?): Intent {
+        fun createMainIntentToShowEventDetails(context: Context, eventId: String, calendarId: String, occurrenceNumber: Int?): Intent {
             return Intent(context, MainActivity::class.java).apply {
                 action = INTENT_ACTION_SHOW_EVENT_DETAILS
-                data = Navigation.Deeplink.toMainActivityWithEventId(eventId, occurrenceNumber ?: 0)
+                data = Navigation.Deeplink.toMainActivityWithEventId(eventId = eventId, calendarId = calendarId, occurrenceNumber = occurrenceNumber ?: 0)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
         }

@@ -72,8 +72,8 @@ class MetadataIndicatorsCalculatorTest {
                 flowOf(finiteRecurring)
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns
                 flowOf(infiniteRecurring)
-        every { eventsDao.selectEventColorsById(any()) } returns eventColorOverrides.map { (id, color) ->
-            EventColorRow(id = id, color = color)
+        every { eventsDao.selectEventColors(any()) } returns eventColorOverrides.map { (id, color) ->
+            EventColorRow(id = id, calendarId = "c1", color = color)
         }
     }
 
@@ -108,7 +108,7 @@ class MetadataIndicatorsCalculatorTest {
                 flowOf(emptyList<EventOccurrenceEntity>())
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns
                 flowOf(emptyList<EventOccurrenceEntity>())
-        every { eventsDao.selectEventColorsById(any()) } returns emptyList()
+        every { eventsDao.selectEventColors(any()) } returns emptyList()
 
         calculator.compute(userId.id, from, to, tz).test {
             assertEquals(setOf(from), awaitItem().keys)

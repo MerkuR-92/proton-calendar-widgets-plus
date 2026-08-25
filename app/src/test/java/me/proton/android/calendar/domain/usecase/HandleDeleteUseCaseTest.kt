@@ -9,6 +9,7 @@ import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -19,6 +20,9 @@ import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalenda
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventEntity
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventResponse
+import me.proton.android.calendar.domain.model.key
+import org.junit.jupiter.api.Assertions.assertEquals
+import java.time.ZonedDateTime
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -83,9 +87,9 @@ internal class HandleDeleteUseCaseTest {
 
         coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity() // We do not care about this EventEntity since it is just used as a parameter for transformEventUseCase and that is mocked above to return event
         coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns provideCalendarUserSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectRootEventEntity(any()) } returns provideEventEntity()
+        coEvery { calendarsRepositoryMock.selectRootEventEntity(any(), any()) } returns provideEventEntity()
         coEvery { calendarsRepositoryMock.deleteEventsById(any(), any()) } just Runs
-        coEvery { calendarsRepositoryMock.deleteEventsMetadataByEventIds(any()) } just Runs
+        coEvery { calendarsRepositoryMock.deleteEventsMetadataByEventIds(any(), any()) } just Runs
         coEvery { calendarsRepositoryMock.fetchEventById(userId, any(), any()) } returns ApiResponse.Success(
             EventApiResponse(
                 event = provideEventResponse()
@@ -193,7 +197,7 @@ internal class HandleDeleteUseCaseTest {
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsById(event.calendar.id, listOf(event.id)) }
-            coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsMetadataByEventIds(listOf(event.id)) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsMetadataByEventIds(any(), listOf(event.id)) }
             coVerify(exactly = 1) { handleAlarmsUseCaseMock.execute(userId) }
         }
     }
@@ -230,7 +234,7 @@ internal class HandleDeleteUseCaseTest {
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsById(event.calendar.id, listOf(event.id)) }
-            coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsMetadataByEventIds(listOf(event.id)) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsMetadataByEventIds(any(), listOf(event.id)) }
             coVerify(exactly = 1) { handleAlarmsUseCaseMock.execute(userId) }
         }
     }
@@ -270,5 +274,42 @@ internal class HandleDeleteUseCaseTest {
             coVerify(exactly = 0) { handleAlarmsUseCaseMock.execute(userId) }
         }
     }
+    @Test
+    fun `deleteSingleEditsAfter only deletes single edits in the same calendar`() {
+        runBlocking {
+            // single edits from other calendars share the uid but must not be deleted here
+            val parent = provideEvent(isRecurring = true)
+            val otherCalendar = parent.calendar.copy(id = "other-calendar")
+
+            val editHere = Event.from(provideEvent(isSingleEdit = true), id = "edit-here", calendar = parent.calendar)
+            val editElsewhere = Event.from(provideEvent(isSingleEdit = true), id = "edit-elsewhere", calendar = otherCalendar)
+
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
+            coEvery { eventDecryptorMock.decrypt(match<EventEntity> { it.id == provideEventEntity().id }) } returns parent
+            coEvery { eventDecryptorMock.decrypt(match<EventEntity> { it.id == "edit-here" }) } returns editHere
+            coEvery { eventDecryptorMock.decrypt(match<EventEntity> { it.id == "edit-elsewhere" }) } returns editElsewhere
+            coEvery { calendarsApiMock.getEventsByUid(userId, any(), any(), any()) } returns ApiResponse.Success(
+                EventsByUidApiResponse(
+                    listOf(
+                        provideEventResponse(isSingleEdit = true).copy(id = "edit-here"),
+                        provideEventResponse(isSingleEdit = true).copy(id = "edit-elsewhere")
+                    )
+                )
+            )
+
+            val body = slot<SyncEventsUpdateApiRequest>()
+            coEvery { calendarsApiMock.syncEvents(userId, parent.calendar.id, capture(body)) } returns
+                ApiResponse.Success(getSyncEventsApiResponse())
+
+            getHandleDeleteUseCase().handleDeleteSingleEdits(
+                userId,
+                parent.key,
+                ZonedDateTime.parse("1970-01-01T00:00:00Z")
+            )
+
+            assertEquals(listOf("edit-here"), body.captured.events.filterIsInstance<SyncEventDeleteContainer>().map { it.id })
+        }
+    }
+
 }
 

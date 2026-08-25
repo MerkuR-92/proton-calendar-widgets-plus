@@ -18,10 +18,12 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.debounceExceptFirst
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
+import me.proton.android.calendar.data.entity.key
 import me.proton.android.calendar.domain.indicators.MetadataIndicatorsCalculator
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.core.domain.entity.UserId
@@ -143,7 +145,7 @@ class GetUiEventsUseCase @Inject constructor(
                             suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? {
                                 val cached = eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
                                 val event = cached
-                                    ?: database.eventsDao().selectById(occ.eventId)?.let {
+                                    ?: database.eventsDao().selectEvent(occ.eventId, occ.calendarId)?.let {
                                         eventDecryptor.decrypt(it)
                                     }
                                 return event?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
@@ -162,8 +164,8 @@ class GetUiEventsUseCase @Inject constructor(
                                     originalModifyTime = occ.modifyTime,
                                     calendarColor = calendarColor,
                                     siblings = siblingEntities
-                                        .map { UiEventExpansionCache.SiblingId(it.id, it.modifyTime) }
-                                        .sortedBy { it.eventId },
+                                        .map { UiEventExpansionCache.SiblingId(it.id, it.calendarId, it.modifyTime) }
+                                        .sortedWith(compareBy({ it.eventId }, { it.calendarId })),
                                     fromDate = eventsWindow.fromDate,
                                     toDate = eventsWindow.toDate,
                                     timeZoneId = eventsWindow.timeZoneId,
@@ -199,12 +201,12 @@ class GetUiEventsUseCase @Inject constructor(
                                 }
 
                             val transformedFiniteRecurring =
-                                finiteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
+                                finiteRecurring.distinctBy { it.key }.parallelMap { occ ->
                                     expandWithCache(occ)
                                 }.flatten()
 
                             val transformedInfiniteRecurring =
-                                filteredInfiniteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
+                                filteredInfiniteRecurring.distinctBy { it.key }.parallelMap { occ ->
                                     expandWithCache(occ)
                                 }.flatten()
 

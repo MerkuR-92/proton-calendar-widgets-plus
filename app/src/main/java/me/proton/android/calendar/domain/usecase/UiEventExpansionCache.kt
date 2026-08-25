@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class UiEventExpansionCache @Inject constructor() {
 
-    data class SiblingId(val eventId: String, val modifyTime: Long)
+    data class SiblingId(val eventId: String, val calendarId: String, val modifyTime: Long)
 
     data class Key(
         val originalEventId: String,
