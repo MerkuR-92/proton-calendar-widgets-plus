@@ -21,8 +21,13 @@ abstract class EventOccurrencesDao : BaseDao<EventOccurrenceEntity> {
     @Query("SELECT * FROM events_occurrences WHERE userId = :userId AND calendarId IN (:calendarIds) AND rRule IS NOT null AND lastOccurrenceEndTime IS null AND firstOccurrenceStartTime <= :timestampSecondsTo")
     abstract fun selectInfiniteRecurring(userId: String, calendarIds: List<String>, timestampSecondsTo: Long): Flow<List<EventOccurrenceEntity>>
 
-    @Query("SELECT EXISTS(SELECT * FROM events_occurrences WHERE userId = :userId AND eventId = :eventId AND calendarId = :calendarId AND modifyTime >= :modifyTime)")
-    abstract fun hasOccurrenceWithEqualOrHigherModifyTime(userId: String, calendarId: String, eventId: String, modifyTime: Long): Boolean
+    // no window filter: a single edit moved out of the window still has to mask its parent occurrence
+    @Query("SELECT * FROM events_occurrences WHERE userId = :userId AND calendarId IN (:calendarIds) AND recurrenceID IS NOT NULL")
+    abstract fun selectSingleEdits(userId: String, calendarIds: List<String>): Flow<List<EventOccurrenceEntity>>
+
+    // requireStartTimeZone: rows without one predate the column and shouldn't count as fresh
+    @Query("SELECT EXISTS(SELECT * FROM events_occurrences WHERE userId = :userId AND eventId = :eventId AND calendarId = :calendarId AND modifyTime >= :modifyTime AND (:requireStartTimeZone = 0 OR startTimeZone != ''))")
+    abstract fun hasOccurrenceWithEqualOrHigherModifyTime(userId: String, calendarId: String, eventId: String, modifyTime: Long, requireStartTimeZone: Boolean): Boolean
 
     // cheap count for widget to respond to post-login insertions
     @Query("SELECT COUNT(*) FROM events_occurrences WHERE userId = :userId")

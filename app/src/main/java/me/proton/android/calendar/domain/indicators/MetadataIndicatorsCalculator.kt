@@ -147,15 +147,19 @@ class MetadataIndicatorsCalculator @Inject constructor(
                         database.eventOccurrencesDao()
                             .selectInfiniteRecurring(userId, calendarIds, toEpoch)
                             .debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                        database.eventOccurrencesDao()
+                            .selectSingleEdits(userId, calendarIds)
+                            .debounceExceptFirst(1.seconds).distinctUntilChanged(),
                         getUserInfoUseCase()
                             .debounceExceptFirst(1.seconds).distinctUntilChanged(),
-                    ) { nonRecurring, finiteRecurring, infiniteRecurringRaw, userInfo ->
+                    ) { nonRecurring, finiteRecurring, infiniteRecurringRaw, allSingleEdits, userInfo ->
                         withContext(Dispatchers.Default) {
                             buildOccurrences(
                                 visibleCalendars = visibleCalendars,
                                 nonRecurring = nonRecurring,
                                 finiteRecurring = finiteRecurring,
                                 infiniteRecurringRaw = infiniteRecurringRaw,
+                                allSingleEdits = allSingleEdits,
                                 isFreeUser = !userInfo.hasSubscriptionForMail,
                                 fromDate = fromDate,
                                 toDate = toDate,
@@ -180,6 +184,7 @@ class MetadataIndicatorsCalculator @Inject constructor(
         nonRecurring: List<EventOccurrenceEntity>,
         finiteRecurring: List<EventOccurrenceEntity>,
         infiniteRecurringRaw: List<EventOccurrenceEntity>,
+        allSingleEdits: List<EventOccurrenceEntity>,
         isFreeUser: Boolean,
         fromDate: LocalDate,
         toDate: LocalDate,
@@ -211,6 +216,7 @@ class MetadataIndicatorsCalculator @Inject constructor(
 
         val allRows = nonRecurring + finiteRecurring + infiniteRecurring
         val byUid = allRows.groupBy { it.eventUid }
+        val singleEditsByUid = allSingleEdits.groupBy { it.eventUid }
 
         // per-event color overrides
         val eventColorByKey: Map<EventKey, String?> = if (isFreeUser) {
@@ -230,10 +236,11 @@ class MetadataIndicatorsCalculator @Inject constructor(
 
         val result = mutableListOf<SkeletonOccurrence>()
 
-        for ((_, group) in byUid) {
+        for ((uid, group) in byUid) {
             val parents = group.filter { it.recurrenceID == null }
             val overrides = group.filter { it.recurrenceID != null }
-            val overrideRecurrenceInstants = overrides
+            // mask with all single edits of this uid, not just the windowed ones, like the decrypt path does
+            val overrideRecurrenceInstants = (overrides + singleEditsByUid[uid].orEmpty())
                 .mapNotNull { it.recurrenceID }
                 .map { Instant.ofEpochSecond(it) }
                 .toSet()
@@ -262,7 +269,8 @@ class MetadataIndicatorsCalculator @Inject constructor(
                 } else {
                     // recurring parent: expand RRULE in the event's ORIGINAL timezone, filter by EXDATE and override RECURRENCE-IDs
                     val rrule = rep.rRule
-                    val expansionTz = rep.startTimeZone.ifBlank { timeZoneId }
+                    // all-day is anchored at UTC midnight; derive its date in UTC so it can't shift a day
+                    val expansionTz = if (rep.fullDay != 0) "UTC" else rep.startTimeZone.ifBlank { timeZoneId }
 
                     val sample = rows.firstOrNull { it.startTime != null && it.endTime != null }
                         ?: continue
