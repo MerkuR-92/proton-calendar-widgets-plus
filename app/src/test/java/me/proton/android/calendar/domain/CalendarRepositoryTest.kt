@@ -307,7 +307,7 @@ internal class CalendarRepositoryTest {
     fun `should not fetch events from metadata if they are up-to-date`() {
         runBlocking {
             val metadata = createEventMetadata("id modified at 1", modifyTime = 1)
-            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns createEventEntity(metadata.id, modifyTime = metadata.modifyTime)
+            coEvery { appDatabaseMock.eventsDao().selectEvent(metadata.id, metadata.calendarId) } returns createEventEntity(metadata.id, modifyTime = metadata.modifyTime)
 
             assertThat(getCalendarRepository().shouldFetchEvent(UserId("userid-1"), metadata)).isFalse()
         }
@@ -320,7 +320,7 @@ internal class CalendarRepositoryTest {
                 startTime = 1577890800, // 1. January 2020 15:00:00 UTC
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
             )
-            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { appDatabaseMock.eventsDao().selectEvent(metadata.id, metadata.calendarId) } returns null
             coEvery { updateFetchedEventsMetadataUseCaseMock.isWindowFullyFetched(any(), any(), any(), any()) } returns false
 
             val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
@@ -352,7 +352,7 @@ internal class CalendarRepositoryTest {
                 startTime = 1577890800, // 1. January 2020 15:00:00 UTC
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
             )
-            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { appDatabaseMock.eventsDao().selectEvent(metadata.id, metadata.calendarId) } returns null
             coEvery { updateFetchedEventsMetadataUseCaseMock.isWindowFullyFetched(any(), any(), any(), any()) } returns false
 
             val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
@@ -384,7 +384,7 @@ internal class CalendarRepositoryTest {
                 startTime = 1577890800, // 1. January 2020 15:00:00 UTC
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
             )
-            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { appDatabaseMock.eventsDao().selectEvent(metadata.id, metadata.calendarId) } returns null
             coEvery { updateFetchedEventsMetadataUseCaseMock.isWindowFullyFetched(any(), any(), any(), any()) } returns true
 
             val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
@@ -414,7 +414,7 @@ internal class CalendarRepositoryTest {
         runBlocking {
             // here the FetchWindows are empty
             val metadata = createEventMetadata("id modified at 1", modifyTime = 1, rRule = "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR")
-            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { appDatabaseMock.eventsDao().selectEvent(metadata.id, metadata.calendarId) } returns null
 
             assertThat(getCalendarRepository().shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
         }
@@ -647,7 +647,7 @@ internal class CalendarRepositoryTest {
         coEvery { appDatabaseMock.eventOccurrencesDao().selectEventRefsByUids(any()) } coAnswers {
             val chunk = firstArg<Set<String>>()
             refChunks.add(chunk)
-            chunk.map { EventOccurrencesDao.EventUidRef(eventId = it, eventUid = it) }
+            chunk.map { EventOccurrencesDao.EventUidRef(eventId = it, calendarId = "c1", eventUid = it) }
         }
         val idChunks = mutableListOf<Set<String>>()
         coEvery { appDatabaseMock.eventsDao().selectByIdIn(any()) } coAnswers {
@@ -662,6 +662,41 @@ internal class CalendarRepositoryTest {
         assertThat(refChunks.all { it.size <= 999 }).isTrue()
         assertThat(idChunks.all { it.size <= 999 }).isTrue()
         assertThat(refChunks.flatten().toSet()).isEqualTo(uids.toSet())
+    }
+
+    @Test
+    fun `selectRootEventEntity only searches the given calendar`() = runBlocking {
+        // uids are shared across calendars, so the root lookup must stay within one
+        val rootInB = createEventEntity("root-b", paramCalendarId = "calB")
+        coEvery { appDatabaseMock.eventsDao().selectByUidInCalendar(any(), "calB") } returns listOf(rootInB)
+
+        getCalendarRepository().selectRootEventEntity("uid-1", "calB")
+
+        val eventsDao = appDatabaseMock.eventsDao()
+        coVerify { eventsDao.selectByUidInCalendar(any(), "calB") }
+        coVerify(exactly = 0) { eventsDao.selectByUid(any()) }
+    }
+
+    @Test
+    fun `selectEventEntitiesByUids stays under the SQL variable limit with many calendars`() = runBlocking {
+        // calendar ids must not be bound - they'd eat into SQLite's 999 variable limit
+        val uids = (0 until 1000).map { "uid-$it" }
+        val calendars = (0 until 150).map { "cal-$it" }
+
+        coEvery { appDatabaseMock.eventOccurrencesDao().selectEventRefsByUids(any()) } coAnswers {
+            firstArg<Set<String>>().mapIndexed { i, uid ->
+                EventOccurrencesDao.EventUidRef(eventId = uid, calendarId = calendars[i % calendars.size], eventUid = uid)
+            }
+        }
+        val bindCounts = mutableListOf<Int>()
+        coEvery { appDatabaseMock.eventsDao().selectByIdIn(any()) } coAnswers {
+            bindCounts.add(firstArg<Collection<String>>().size)
+            firstArg<Collection<String>>().map { createEventEntity(it) }
+        }
+
+        getCalendarRepository().selectEventEntitiesByUids(uids)
+
+        assertThat(bindCounts.all { it <= 999 }).isTrue()
     }
 
     @Test

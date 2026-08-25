@@ -36,7 +36,7 @@ internal fun List<UiEvent>.toWidgetSnapshot(
             if (widgetEvents.size >= MAX_WIDGET_EVENTS) return@forEach
             val sorted = entry.value
                 .filter { !it.isInThePast() }
-                .distinctBy { it.id to it.occurrenceNumber }
+                .distinctBy { Triple(it.id, it.calendarId, it.occurrenceNumber) }
                 .sortedBy { "${!it.isAllDay}${it.dateStart.toEpochSecond()}${it.summary}" }
 
             sorted.forEachIndexed { index, e ->
@@ -136,6 +136,7 @@ private fun UiEvent.toWidgetEvent(
 
     return WidgetEvent(
         id = this.id,
+        calendarId = this.calendarId,
         summary = this.summary?.replace("\n", " ")?.takeIfNotBlank()
             ?: resourceProvider.provideString(R.string.default_event_summary),
         subheaderContent = subheaderContent,

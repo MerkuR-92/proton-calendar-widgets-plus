@@ -659,7 +659,7 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     override fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
-        return this.distinctBy { "${it.eventId} ${it.occurrence} ${Duration.parse(it.trigger).toMillis()} ${it.action}" }
+        return this.distinctBy { "${it.calendarId} ${it.eventId} ${it.occurrence} ${Duration.parse(it.trigger).toMillis()} ${it.action}" }
     }
 
     override fun List<Event>.filterOutEventsBySearchTerm(searchTerm: String): List<Event> {

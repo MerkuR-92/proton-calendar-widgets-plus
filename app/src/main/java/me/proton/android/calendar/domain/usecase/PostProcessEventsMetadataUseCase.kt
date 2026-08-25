@@ -77,7 +77,7 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
     }
 
     private suspend fun fetchEventEntity(userId: UserId, response: EventEntityMetadata): EventEntity? {
-        return when (val result = calendarsRepository.fetchEventById(userId, response.calendarId, response.id)) {
+        return when (val result = calendarsRepository.fetchEventById(userId = userId, calendarId = response.calendarId, eventId = response.id)) {
             is ApiResponse.Success<EventApiResponse> -> result.data.event.toEventEntity()
             is ApiResponse.Error -> {
                 // If event was not found just omit it, otherwise we'll retry this indefinitely

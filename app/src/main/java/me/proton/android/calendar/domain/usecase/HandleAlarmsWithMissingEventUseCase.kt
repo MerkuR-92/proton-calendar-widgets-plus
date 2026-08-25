@@ -35,7 +35,7 @@ class HandleAlarmsWithMissingEventUseCase @Inject constructor(
         eventId: String
     ): UseCase.Result {
 
-        val event = when (val result = calendarsRepository.fetchEventById(userId, calendarId, eventId)) {
+        val event = when (val result = calendarsRepository.fetchEventById(userId = userId, calendarId = calendarId, eventId = eventId)) {
             is ApiResponse.Success<EventApiResponse> -> {
                 result.data.event
             }

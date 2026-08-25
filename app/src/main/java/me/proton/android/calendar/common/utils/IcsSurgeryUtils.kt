@@ -18,6 +18,7 @@ import biweekly.property.Method
 import biweekly.util.DateTimeComponents
 import biweekly.util.Duration
 import biweekly.util.Frequency
+import me.proton.android.calendar.domain.model.EventKey
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
@@ -78,6 +79,7 @@ object IcsSurgeryUtils {
     sealed class HandleIcsResult {
         data class Success(
             val eventId: String,
+            val calendarId: String,
             val action: HandleIcsAction,
             val newAttendeeStatus: Pair<String, ParticipationStatus>? = null,
             val isRecurring: Boolean? = false
@@ -106,10 +108,10 @@ object IcsSurgeryUtils {
             object NoEvents: Error()
 
             data class EditCreateEventError(val userErrorMessage: String? = null): Error()
-            data class ReplyPartyCrasher(val eventId: String? = null): Error()
-            data class DecryptionFailed(val eventId: String? = null, val calendarId: String? = null, val isRecurring: Boolean? = null): Error()
-            data class DisabledCalendar(val eventId: String? = null): Error()
-            data class Method(val eventId: String? = null): Error()
+            data class ReplyPartyCrasher(val key: EventKey?): Error()
+            data class DecryptionFailed(val key: EventKey?, val isRecurring: Boolean?): Error()
+            data class DisabledCalendar(val key: EventKey?): Error()
+            data class Method(val key: EventKey?): Error()
 
             sealed class Unsupported: Error() {
                 object Method: Unsupported()

@@ -24,9 +24,6 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId")
     abstract suspend fun selectEvent(eventId: String, calendarId: String): EventEntity?
 
-    @Query("SELECT * FROM events WHERE id IN (:ids)")
-    abstract suspend fun selectByIdIn(ids: Set<String>): List<EventEntity>
-
     @RawQuery
     abstract suspend fun selectEventsMatchingRaw(query: SupportSQLiteQuery): List<EventEntity>
 
@@ -36,11 +33,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events")
     abstract fun selectSkeletonEventsFlow(): Flow<List<SkeletonEventEntity>>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE id IN (:ids) ORDER BY ID")
-    abstract fun selectSkeletonEventsById(ids: List<String>): List<SkeletonEventEntity>
-
-    @Query("SELECT ID, Color FROM events WHERE id IN (:ids)")
-    abstract fun selectEventColorsById(ids: List<String>): List<EventColorRow>
+    // no calendar filter: callers key rows by (id, calendarId), and extra binds cost against SQLite's 999 limit
+    @Query("SELECT ID, CalendarID, Color FROM events WHERE id IN (:ids)")
+    abstract fun selectEventColors(ids: List<String>): List<EventColorRow>
 
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE calendarId = :calendarId")
     abstract fun getSkeletonEventsInCalendarFlow(calendarId: String): Flow<List<SkeletonEventEntity>>
@@ -63,14 +58,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")
     abstract suspend fun selectEvents(calendarIds: List<String>): List<EventEntity>
 
-    @Query("SELECT * FROM events WHERE id = :id")
-    abstract fun selectByIdFlow(id: String): Flow<EventEntity?>
-
-    @Query("SELECT * FROM events WHERE id = :id")
-    abstract suspend fun selectById(id: String): EventEntity?
-
-    @Query("SELECT * FROM events WHERE id IN (:eventIds)")
-    abstract suspend fun selectAllById(eventIds: List<String>): List<EventEntity>
+    // no calendar filter: callers key rows by (id, calendarId), and extra binds cost against SQLite's 999 limit
+    @Query("SELECT * FROM events WHERE id IN (:ids)")
+    abstract suspend fun selectByIdIn(ids: Collection<String>): List<EventEntity>
 
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%DTSTART;VALUE=DATE:%'")
     abstract suspend fun selectAllDayOnly(): List<EventEntity>
@@ -84,6 +74,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Deprecated("Format UID with formatUidForICal")
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
     abstract suspend fun selectByUid(uid: String): List<EventEntity>
+
+    @Query("SELECT * FROM events WHERE calendarId = :calendarId AND sharedEvents LIKE '%UID:' || :uid || '%'")
+    abstract suspend fun selectByUidInCalendar(uid: String, calendarId: String): List<EventEntity>
 
     @Deprecated("Format UID with formatUidForICal")
     @Query("SELECT COUNT(id) FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
@@ -105,8 +98,8 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT COUNT(id) FROM events WHERE calendarId = :calendarId")
     abstract suspend fun count(calendarId: String): Int
 
-    @Query("DELETE FROM events WHERE id IN (:ids)")
-    abstract suspend fun deleteByIds(ids: List<String>)
+    @Query("DELETE FROM events WHERE calendarId = :calendarId AND id IN (:ids)")
+    abstract suspend fun deleteByIds(calendarId: String, ids: List<String>)
 
     @Query("DELETE FROM events WHERE calendarId = :calendarId")
     abstract suspend fun deleteAll(calendarId: String)

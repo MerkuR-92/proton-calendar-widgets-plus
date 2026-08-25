@@ -120,10 +120,11 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
                     userId,
                     editMode = false,
                     meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
-                    navigationArguments.eventId,
-                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                    null,
-                    null
+                    eventId = navigationArguments.eventId,
+                    calendarId = navigationArguments.calendarId,
+                    occurrenceNumber = if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                    initStartDate = null,
+                    initStartTime = null
                 )
             if (viewModeInitStatus == EventViewModel.InitResult.Success) {
                 requireActivity().clearFocusAndHideKeyboard(view)
@@ -220,10 +221,11 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
                         userId,
                         editMode = true,
                         meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
-                        navigationArguments.eventId,
-                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                        null,
-                        null
+                        eventId = navigationArguments.eventId,
+                        calendarId = navigationArguments.calendarId,
+                        occurrenceNumber = if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                        initStartDate = null,
+                        initStartTime = null
                     )
                 }
             }

@@ -67,7 +67,7 @@ class SearchFragment() : BaseDialogFragment<FragmentSearchBinding>(), KoinCompon
         timelineEventAdapter = TimelineEventAdapter {
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigate(
-                Navigation.Deeplink.toEventDetails(it.id, it.occurrenceNumber)
+                Navigation.Deeplink.toEventDetails(eventId = it.id, calendarId = it.calendarId, occurrenceNumber = it.occurrenceNumber)
             )
         }
 

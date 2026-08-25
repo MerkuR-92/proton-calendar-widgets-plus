@@ -10,9 +10,11 @@ import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
+import me.proton.android.calendar.data.entity.key
 import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
@@ -25,6 +27,7 @@ import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
 import me.proton.core.util.kotlin.deserialize
 import me.proton.core.util.kotlin.mapNotNullAsync
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class CalendarEventListener @Inject constructor(
@@ -40,7 +43,8 @@ class CalendarEventListener @Inject constructor(
     override val order: Int = 3
     override val type: Type = Type.Calendar
 
-    private var eventEntities = hashMapOf<String, EventEntity>()
+    // shared across all calendars' sync loops, so keyed by (eventId, calendarId)
+    private val eventEntities = ConcurrentHashMap<EventKey, EventEntity>()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
@@ -62,13 +66,13 @@ class CalendarEventListener @Inject constructor(
             }.mapNotNullAsync { metadata ->
                 fetchEventEntity(config.userId, metadata)
             }.associateBy { event ->
-                event.id
+                event.key
             }
         )
     }
 
     private suspend fun fetchEventEntity(userId: UserId, response: EventEntityMetadata): EventEntity? {
-        return when (val result = calendarsRepository.fetchEventById(userId, response.calendarId, response.id)) {
+        return when (val result = calendarsRepository.fetchEventById(userId = userId, calendarId = response.calendarId, eventId = response.id)) {
             is ApiResponse.Success<EventApiResponse> -> result.data.event.toEventEntity()
             is ApiResponse.Error -> {
                 // if event not found just omit it, otherwise we'll retry this indefinitely
@@ -89,13 +93,13 @@ class CalendarEventListener @Inject constructor(
             return
         }
 
-        val entityIds = entities.map { it.id }
-        if (entityIds.isEmpty()) return
-        val entitiesToCreate = entityIds.mapNotNull { eventEntities[it] }
+        val entityKeys = entities.map { EventKey(it.id, it.calendarId) }
+        if (entityKeys.isEmpty()) return
+        val entitiesToCreate = entityKeys.mapNotNull { eventEntities[it] }
         calendarsRepository.persistEvents(*entitiesToCreate.toTypedArray())
 
         val affectedEventEntityMetadatas = entities.filter {
-            eventEntityMetadata -> entitiesToCreate.firstOrNull { it.id == eventEntityMetadata.id } != null
+            eventEntityMetadata -> entitiesToCreate.firstOrNull { it.key == EventKey(eventEntityMetadata.id, eventEntityMetadata.calendarId) } != null
         }
 
         affectedEventEntityMetadatas.forEach {
@@ -109,13 +113,13 @@ class CalendarEventListener @Inject constructor(
             return
         }
         
-        val entityIds = entities.map { it.id }
-        if (entityIds.isEmpty()) return
-        val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
+        val entityKeys = entities.map { EventKey(it.id, it.calendarId) }
+        if (entityKeys.isEmpty()) return
+        val entitiesToUpdate = entityKeys.mapNotNull { eventEntities[it] }
         calendarsRepository.persistEvents(*entitiesToUpdate.toTypedArray())
 
         val affectedEventEntityMetadatas = entities.filter {
-            eventEntityMetadata -> entitiesToUpdate.firstOrNull { it.id == eventEntityMetadata.id } != null
+            eventEntityMetadata -> entitiesToUpdate.firstOrNull { it.key == EventKey(eventEntityMetadata.id, eventEntityMetadata.calendarId) } != null
         }
 
         affectedEventEntityMetadatas.forEach {
@@ -125,8 +129,9 @@ class CalendarEventListener @Inject constructor(
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         if (keys.isEmpty()) return
-        calendarsRepository.deleteEventsMetadataByEventIds(keys)
-        calendarsRepository.deleteEventsById(config.asCalendar().calendarId, keys)
+        val calendarId = config.asCalendar().calendarId
+        calendarsRepository.deleteEventsMetadataByEventIds(calendarId, keys)
+        calendarsRepository.deleteEventsById(calendarId, keys)
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {
@@ -148,21 +153,24 @@ class CalendarEventListener @Inject constructor(
     }
 
     override suspend fun onSuccess(config: EventManagerConfig) {
-        // Get all the created or updated events ids
-        val entityIds = getActionMap(config)[Action.Create]?.mapNotNull {
-            it.entity?.id
+        // Get all the created or updated events
+        val entityKeys = getActionMap(config)[Action.Create]?.mapNotNull {
+            it.entity?.let { entity -> EventKey(entity.id, entity.calendarId) }
         }.orEmpty() + getActionMap(config)[Action.Update]?.mapNotNull {
-            it.entity?.id
+            it.entity?.let { entity -> EventKey(entity.id, entity.calendarId) }
         }.orEmpty()
 
-        val entitiesToPostProcess = entityIds.mapNotNull { eventEntities[it] }
+        val entitiesToPostProcess = entityKeys.mapNotNull { eventEntities[it] }
         if (entitiesToPostProcess.isEmpty()) return
 
         // Post process received events
         updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess)
         widgetRefresher.refreshEventList()
+    }
 
-        // Clean cached entities
-        eventEntities.clear()
+    // clear here rather than in onSuccess, which is skipped on failure
+    override suspend fun onComplete(config: EventManagerConfig) {
+        val calendarId = config.asCalendar().calendarId
+        eventEntities.keys.removeAll { it.calendarId == calendarId }
     }
 }

@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -720,7 +721,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock single edit event with user as attendee
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity()
+            coEvery { calendarsRepositoryMock.selectEventEntity(EventKey(singleEditEventId, calendarId)) } returns EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity()
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity())
             } else {
@@ -854,7 +855,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock single edit event with user as attendee
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity()
+            coEvery { calendarsRepositoryMock.selectEventEntity(EventKey(singleEditEventId, calendarId)) } returns EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity()
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity())
             } else {

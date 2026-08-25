@@ -198,10 +198,15 @@
         <deepLink
             android:id="@+id/deepLink"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/details?eventId={eventId}&amp;occurrenceNumber={occurrenceNumber}" />
+            app:uri="proton-calendar://protonmail.com/event/details?eventId={eventId}&amp;calendarId={calendarId}&amp;occurrenceNumber={occurrenceNumber}" />
         <argument
             android:name="eventId"
             app:argType="string" />
+        <argument
+            android:name="calendarId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
         <argument
             android:name="occurrenceNumber"
             app:argType="integer"
@@ -215,17 +220,22 @@
         <deepLink
             android:id="@+id/deepLink2"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
+            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;calendarId={calendarId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
         <deepLink
             android:id="@+id/deepLink3"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/create?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
+            app:uri="proton-calendar://protonmail.com/event/create?eventId={eventId}&amp;calendarId={calendarId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
         <deepLink
             android:id="@+id/deepLink4"
             android:autoVerify="true"
             app:uri="proton-calendar://protonmail.com/event/create?prefill={prefill}&amp;userId={userId}&amp;startMillis={startMillis}&amp;endMillis={endMillis}&amp;timeZoneId={timeZoneId}&amp;allDay={allDay}&amp;title={title}&amp;description={description}&amp;location={location}&amp;rRule={rRule}" />
         <argument
             android:name="eventId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="calendarId"
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
@@ -300,9 +310,14 @@
         <deepLink
             android:id="@+id/deepLinkEditPersonal"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/editPersonal?eventId={eventId}&amp;occurrenceNumber={occurrenceNumber}" />
+            app:uri="proton-calendar://protonmail.com/event/editPersonal?eventId={eventId}&amp;calendarId={calendarId}&amp;occurrenceNumber={occurrenceNumber}" />
         <argument
             android:name="eventId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="calendarId"
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />

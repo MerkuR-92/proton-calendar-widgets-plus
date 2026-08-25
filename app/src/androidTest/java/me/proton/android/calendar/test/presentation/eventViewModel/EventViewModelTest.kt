@@ -8,6 +8,7 @@ import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.test.shared.mocks.*
 import org.junit.Ignore
 import org.junit.Test
@@ -222,7 +223,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
             // Mock single edit event
             val singleEditEventEntity = EventMocks.provideEventResponse(isSingleEdit = true)
             val singleEditEvent = EventMocks.provideEvent(isSingleEdit = true)
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns singleEditEventEntity.toEventEntity()
+            coEvery { calendarsRepositoryMock.selectEventEntity(EventKey(singleEditEventId, calendarId)) } returns singleEditEventEntity.toEventEntity()
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(singleEditEventEntity.toEventEntity())
             } else {
@@ -232,7 +233,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
             // Mock root event
             val rootEventEntity = EventMocks.provideEventResponse()
             val rootEvent = EventMocks.provideEvent(isRecurring = true)
-            coEvery { calendarsRepositoryMock.selectRootEventEntity(eventUid) } returns rootEventEntity.toEventEntity()
+            coEvery { calendarsRepositoryMock.selectRootEventEntity(eventUid, calendarId) } returns rootEventEntity.toEventEntity()
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(rootEventEntity.toEventEntity())
             } else {

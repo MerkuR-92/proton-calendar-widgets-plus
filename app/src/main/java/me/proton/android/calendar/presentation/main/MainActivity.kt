@@ -120,6 +120,7 @@ import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -569,12 +570,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                     // convert "main" deeplink to "event details" deeplink and navigate manually
                     val eventId = eventDetailsIntent.data?.getQueryParameter("eventId")
+                    val calendarId = eventDetailsIntent.data?.getQueryParameter("calendarId")
                     val occurrenceNumber = eventDetailsIntent.data?.getQueryParameter("occurrenceNumber")
-                    if (eventId != null && occurrenceNumber != null) {
-                        val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, occurrenceNumber.toInt())
+                    if (eventId != null && calendarId != null && occurrenceNumber != null) {
+                        val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId = eventId, calendarId = calendarId, occurrenceNumber = occurrenceNumber.toInt())
                         safeNavigateToDialogFragment(eventDetailsDeepLink)
                     } else {
-                        logger.e("could not get eventId/occurrenceNumber from INTENT_ACTION_SHOW_EVENT_DETAILS")
+                        logger.e("could not get eventId/calendarId/occurrenceNumber from INTENT_ACTION_SHOW_EVENT_DETAILS")
                         safeNavigateToMonth()
                     }
 
@@ -864,7 +866,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             when (val handleEventLinkResult = eventViewModel.handleEventLink(userId, eventId, calendarId, recurrenceId)) {
                 is EventViewModel.EventLinkResult.Success -> {
-                    val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, handleEventLinkResult.occurrenceNumber)
+                    val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId = eventId, calendarId = calendarId, occurrenceNumber = handleEventLinkResult.occurrenceNumber)
                     safeNavigateToDialogFragment(eventDetailsDeepLink)
                 }
                 is EventViewModel.EventLinkResult.DecryptionFailed -> {
@@ -1044,9 +1046,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT -> Unit // TODO not yet implemented
                 }
 
-                val eventId = handleIcsImportResult.eventId
-                val eventDetailsDeepLink =
-                    Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else 0)
+                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(
+                    eventId = handleIcsImportResult.eventId,
+                    calendarId = handleIcsImportResult.calendarId,
+                    occurrenceNumber = if (handleIcsImportResult.isRecurring == true) 1 else 0
+                )
                 safeNavigateToDialogFragment(eventDetailsDeepLink)
             } else {
                 snackBar.dismiss()
@@ -1133,22 +1137,23 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         Snackbar.LENGTH_LONG
                     )
                     is Error.DisabledCalendar -> navigatedToDetails = displayErrorAndOpenDetails(
-                        handleIcsImportResult.eventId,
-                        getString(R.string.snack_ics_disabled_calendar_error)
+                        key = handleIcsImportResult.key,
+                        errorMessage = getString(R.string.snack_ics_disabled_calendar_error)
                     )
                     is Error.ReplyPartyCrasher -> navigatedToDetails = displayErrorAndOpenDetails(
-                        handleIcsImportResult.eventId,
-                        getString(R.string.snack_ics_reply_party_crasher_error)
+                        key = handleIcsImportResult.key,
+                        errorMessage = getString(R.string.snack_ics_reply_party_crasher_error)
                     )
                     is Error.Method -> navigatedToDetails = displayErrorAndOpenDetails(
-                        handleIcsImportResult.eventId,
-                        getString(R.string.snack_ics_invalid_error)
+                        key = handleIcsImportResult.key,
+                        errorMessage = getString(R.string.snack_ics_invalid_error)
                     )
                     is Error.DecryptionFailed -> {
-                        if (handleIcsImportResult.eventId != null && handleIcsImportResult.calendarId != null) {
+                        val key = handleIcsImportResult.key
+                        if (key != null) {
                             deleteFailedToDecryptEvent(
-                                handleIcsImportResult.eventId,
-                                handleIcsImportResult.calendarId,
+                                key.eventId,
+                                key.calendarId,
                                 handleIcsImportResult.isRecurring
                             )
                         } else this@MainActivity.displaySnackBar(
@@ -1202,10 +1207,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private fun displayErrorAndOpenDetails(eventId: String?, errorMessage: String): Boolean {
-        return if (eventId != null) {
+    private fun displayErrorAndOpenDetails(key: EventKey?, errorMessage: String): Boolean {
+        return if (key != null) {
             Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_LONG).show()
-            val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
+            val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId = key.eventId, calendarId = key.calendarId)
             safeNavigateToDialogFragment(eventDetailsDeepLink)
             true
         } else {

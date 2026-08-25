@@ -156,10 +156,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     userId,
                     editMode = false,
                     meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
-                    navigationArguments.eventId,
-                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                    null,
-                    null
+                    eventId = navigationArguments.eventId,
+                    calendarId = navigationArguments.calendarId,
+                    occurrenceNumber = if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                    initStartDate = null,
+                    initStartTime = null
                 )
             if (viewModeInitStatus == EventViewModel.InitResult.Success) {
                 requireActivity().clearFocusAndHideKeyboard(view)
@@ -375,6 +376,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         editMode = true,
                         meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
                         eventId = null,
+                        calendarId = null,
                         occurrenceNumber = null,
                         initStartDate = startZonedDateTime.toLocalDate().toString(),
                         initStartTime = startZonedDateTime.toLocalTime().toString(),
@@ -392,10 +394,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         userId,
                         editMode = true,
                         meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
-                        navigationArguments.eventId,
-                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                        navigationArguments.initStartDate,
-                        navigationArguments.initStartTime
+                        eventId = navigationArguments.eventId,
+                        calendarId = navigationArguments.calendarId,
+                        occurrenceNumber = if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                        initStartDate = navigationArguments.initStartDate,
+                        initStartTime = navigationArguments.initStartTime
                     )
                 }
             }

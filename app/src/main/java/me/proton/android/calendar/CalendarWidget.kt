@@ -230,7 +230,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                     data = Navigation.Deeplink.toMonth(event.happensOn)
                 } else {
                     action = MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
-                    data = Navigation.Deeplink.toMainActivityWithEventId(event.id, event.occurrenceNumber)
+                    data = Navigation.Deeplink.toMainActivityWithEventId(eventId = event.id, calendarId = event.calendarId, occurrenceNumber = event.occurrenceNumber)
                 }
             }
         )
@@ -247,6 +247,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
 data class WidgetEvent(
     val id: String,
+    val calendarId: String,
     val summary: String,
     val subheaderContent: String,
     val isCancelledOrDeclined: Boolean,

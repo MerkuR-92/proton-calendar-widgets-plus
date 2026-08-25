@@ -24,6 +24,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProto
 import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.key
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
@@ -31,6 +32,8 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
+import me.proton.android.calendar.domain.model.key
 import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
@@ -77,7 +80,7 @@ class SendEmailUseCase @Inject constructor(
 
         val ics = if (isProtonProtonInvite && eventEntity != null) {
 
-            val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
+            val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.key) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
 
             val sharedPropertiesResult = getSharedProperties(userId, upgradedEventEntity)
             if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
@@ -144,7 +147,7 @@ class SendEmailUseCase @Inject constructor(
 
         val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, MailType.INVITE, sendEmailUpdate = sendEmailUpdate)
 
-        val newEventEntity = (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
+        val newEventEntity = (upgradeEventUseCase.execute(userId, newEvent.key) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
 
         val sharedPropertiesResult = getSharedProperties(userId, newEventEntity)
         if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
@@ -230,7 +233,7 @@ class SendEmailUseCase @Inject constructor(
 
         val mailContent = getEmailContent(event, defaultTimeZone, timeFormatIs24Hours, MailType.CANCELLATION)
 
-        val eventEntity = calendarsRepository.selectEventEntity(event.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees failed to select event entity")
+        val eventEntity = calendarsRepository.selectEventEntity(event.key) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees failed to select event entity")
         val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees sharedEventID was null")
 
         val ics = getCancelIcs(

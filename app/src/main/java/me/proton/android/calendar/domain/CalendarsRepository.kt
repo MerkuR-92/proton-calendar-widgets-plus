@@ -19,6 +19,7 @@ import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.entity.UserAddress
@@ -184,13 +185,13 @@ interface CalendarsRepository {
 
     fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event>
 
-    suspend fun selectEventEntity(eventId: String): EventEntity?
+    suspend fun selectEventEntity(key: EventKey): EventEntity?
 
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself
      * if there is only one event with this UID.
      */
-    suspend fun selectRootEventEntity(eventUid: String): EventEntity?
+    suspend fun selectRootEventEntity(eventUid: String, calendarId: String): EventEntity?
 
     suspend fun hasSingleEdits(userId: UserId, eventUid: String): Boolean?
 
@@ -200,7 +201,7 @@ interface CalendarsRepository {
 
     suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String): Boolean?
 
-    suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>)
+    suspend fun deleteEventsMetadataByEventIds(calendarId: String, eventIds: List<String>)
 
     suspend fun deleteEventsMetadataByCalendarId(calendarId: String)
 
@@ -312,11 +313,6 @@ interface CalendarsRepository {
 
     suspend fun fetchEventAlarms(userId: UserId, calendarId: String, eventId: String): ApiResponse<AlarmsApiResponse>
 
-    suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>
-
-    // event alarms
-    suspend fun selectEventAlarm(eventAlarmId: String): EventAlarmEntity?
-
     /**
      * Selects upcoming EventAlarms that should be shown at [timestampSeconds] or the nearest possible timestamp.
      */
@@ -328,10 +324,6 @@ interface CalendarsRepository {
     suspend fun selectAllEventAlarmsBetween(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity>
 
     suspend fun deleteEventAlarmById(id: String)
-
-    suspend fun deleteEventAlarmsForEvent(eventId: String)
-
-    suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
     suspend fun deleteAllEventAlarmsByCalendar(calendarId: String)
 

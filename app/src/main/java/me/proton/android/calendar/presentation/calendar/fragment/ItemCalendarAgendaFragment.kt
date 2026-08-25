@@ -117,8 +117,9 @@ class ItemCalendarAgendaFragment: Fragment() {
                 if (it.decryptionStatus == Event.DecryptionStatus.Success) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(
-                            it.id,
-                            it.occurrenceNumber ?: 0
+                            eventId = it.id,
+                            calendarId = it.calendarId,
+                            occurrenceNumber = it.occurrenceNumber ?: 0
                         )
                     )
                 } else {

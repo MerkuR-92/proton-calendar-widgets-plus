@@ -78,12 +78,15 @@ import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.key
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
+import me.proton.android.calendar.domain.model.key
 import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -379,6 +382,7 @@ class EventViewModel @Inject constructor(
         editMode: Boolean,
         meetIntegrations: Set<MeetIntegrationType>,
         eventId: String?,
+        calendarId: String?,
         occurrenceNumber: Int?,
         initStartDate: String?,
         initStartTime: String?,
@@ -451,8 +455,11 @@ class EventViewModel @Inject constructor(
 
         } else {
 
+            // deep links can arrive without a calendarId, fail soft like the other bad-input paths
+            val eventCalendarId = calendarId
+                ?: return InitResult.Error.Default("EventViewModel: calendarId is required to open an existing event")
             val initialiseEditEventResult = initialiseExistingEvent(
-                eventId,
+                EventKey(eventId, eventCalendarId),
                 occurrenceNumber
             )
             if (initialiseEditEventResult !is InitResult.InitEventSuccess) {
@@ -667,11 +674,11 @@ class EventViewModel @Inject constructor(
      * @returns Initialised existing event or InitResult error
      */
     private suspend fun initialiseExistingEvent(
-        eventId: String,
+        key: EventKey,
         occurrenceNumber: Int?
     ): InitResult {
 
-        val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
+        val dbEventEntity = calendarsRepository.selectEventEntity(key)
         dbEvent = if (dbEventEntity != null) {
             if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(dbEventEntity)
@@ -739,9 +746,10 @@ class EventViewModel @Inject constructor(
 
                     // Clone RRule from original event in DB if we are in edit mode
                     val eventUid = dbEvent?.uid
-                    if (dbEvent?.isSingleEdit() == true && eventUid != null) {
+                    val eventCalendarId = dbEvent?.calendar?.id
+                    if (dbEvent?.isSingleEdit() == true && eventUid != null && eventCalendarId != null) {
                         // We store reference to originalDbEvent for later use
-                        originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
+                        originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid, eventCalendarId)
                             ?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                                 eventDecryptor.decrypt(it)
                             } else {
@@ -2466,7 +2474,7 @@ class EventViewModel @Inject constructor(
         // Make sure to upgrade the event first
         val upgradedEventEntity = (upgradeEventUseCase.execute(
             userId,
-            eventId
+            EventKey(eventId, event.calendar.id)
         ) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>()
         if (upgradedEventEntity == null) {
             logger.e("handleSavePersonal could not upgrade Event. Failed to cast upgrade result to EventEntity")
@@ -2800,7 +2808,7 @@ class EventViewModel @Inject constructor(
                 val eventUid = dbEvent?.uid
                 if (originalDbEvent == null && eventUid != null) {
                     // We only set originalDbEvent in editMode, but we do delete from details so we need to get it here
-                    originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)?.let {
+                    originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid, dbEvent.calendar.id)?.let {
                         if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) eventDecryptor.decrypt(it)
                         else transformEventUseCase.execute(it)
                     }
@@ -3588,7 +3596,7 @@ class EventViewModel @Inject constructor(
             }
             val eventEntityDeferred = if (needsEventFetch) {
                 async {
-                    val result = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id)
+                    val result = calendarsRepository.fetchEventById(userId = userId, calendarId = event.calendar.id, eventId = event.id)
                         .valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
                     result
                 }
@@ -3871,7 +3879,7 @@ class EventViewModel @Inject constructor(
 
         val updateTime = Instant.now()
 
-        val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: logger.e("handleChangeAnswerProtonToProton failed to cast upgrade result to EventEntity")
+        val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.key) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: logger.e("handleChangeAnswerProtonToProton failed to cast upgrade result to EventEntity")
 
         // For proton to proton we first update the participation status on BE
         val updateParticipationStatusUseCaseResult = if (upgradedEventEntity != null) {
@@ -3998,9 +4006,9 @@ class EventViewModel @Inject constructor(
 
     suspend fun handleEventLink(userId: UserId, eventId: String, calendarId: String, recurrenceIdTimestamp: String): EventLinkResult {
         this.userId = userId
-        var eventEntity = calendarsRepository.selectEventEntity(eventId)
+        var eventEntity = calendarsRepository.selectEventEntity(EventKey(eventId, calendarId))
         if (eventEntity == null) {
-            eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
+            eventEntity = calendarsRepository.fetchEventById(userId = userId, calendarId = calendarId, eventId = eventId).valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
                 ?: return EventLinkResult.EventDoesNotExist
         }
         val event = (if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {

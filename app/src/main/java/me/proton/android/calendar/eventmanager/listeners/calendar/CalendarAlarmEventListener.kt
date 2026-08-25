@@ -9,6 +9,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.ScheduleSyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
@@ -18,6 +19,7 @@ import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
 import me.proton.core.util.kotlin.deserialize
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class CalendarAlarmEventListener @Inject constructor(
@@ -32,7 +34,8 @@ class CalendarAlarmEventListener @Inject constructor(
     override val type: Type = Type.Calendar
 
     private val alarmsWithMissingEvent = mutableSetOf<String>()
-    private val missingEvents = mutableSetOf<String>()
+    // shared across all calendars' sync loops, so keyed by (eventId, calendarId)
+    private val missingEvents = ConcurrentHashMap.newKeySet<EventKey>()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
@@ -54,7 +57,7 @@ class CalendarAlarmEventListener @Inject constructor(
                 alarmsWithEvents.add(it)
             } else {
                 // We keep ids of events to fetch and ids of alarms with missing event
-                missingEvents.add(it.eventId)
+                missingEvents.add(EventKey(it.eventId, it.calendarId))
                 alarmsWithMissingEvent.add(it.id)
             }
         }
@@ -74,10 +77,10 @@ class CalendarAlarmEventListener @Inject constructor(
         val alarmEvents = actions[Action.Create].orEmpty() + actions[Action.Update].orEmpty() + actions[Action.Delete].orEmpty()
         if (alarmEvents.isEmpty()) return
 
-        missingEvents.forEach { eventId ->
+        missingEvents.forEach { key ->
             // Launch worker to handle alarms with missing events
             HandleAlarmsWithMissingEventWorker.enqueue(workManager, userId = config.userId.id,
-                calendarId = config.asCalendar().calendarId, eventId = eventId)
+                calendarId = key.calendarId, eventId = key.eventId)
         }
 
         // Launch worker to handle alarms
@@ -91,6 +94,7 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onComplete(config: EventManagerConfig) {
         alarmsWithMissingEvent.clear()
+        missingEvents.removeAll { it.calendarId == config.asCalendar().calendarId }
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {

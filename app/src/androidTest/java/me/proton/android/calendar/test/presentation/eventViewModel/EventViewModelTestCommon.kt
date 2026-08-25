@@ -42,6 +42,7 @@ import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.test.shared.mocks.CalendarMocks
 import me.proton.android.calendar.test.shared.mocks.EventMocks
 import me.proton.android.calendar.test.shared.mocks.UserMocks
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.test.shared.mocks.calendarId
 import me.proton.android.calendar.test.shared.mocks.eventId
 import me.proton.android.calendar.test.shared.mocks.singleEditEventId
@@ -105,7 +106,7 @@ open class EventViewModelTestCommon: KoinComponent {
         coEvery { userManagerMock.getUser(userId) } returns UserMocks.provideUser()
         coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
-        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventResponse().toEventEntity()
+        coEvery { calendarsRepositoryMock.selectEventEntity(EventKey(eventId, calendarId)) } returns EventMocks.provideEventResponse().toEventEntity()
 
         coEvery { calendarWidgetRefresherMock.refreshEventList() } just Runs
     }
@@ -165,6 +166,7 @@ open class EventViewModelTestCommon: KoinComponent {
             editMode,
             setOf(MeetIntegrationType.Zoom, MeetIntegrationType.ProtonMeet),
             eventId,
+            calendarId,
             occurrenceNumber,
             initStartDate,
             initStartTime
@@ -186,7 +188,7 @@ open class EventViewModelTestCommon: KoinComponent {
             // If we edit existing single edit event
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
             if (editMode) {
-                coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any()) }
+                coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any(), any()) }
                 coVerify(exactly = 2) { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptorMock.decrypt(any())
                 } else {

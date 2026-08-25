@@ -21,6 +21,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.EventKey
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.GetUserInfoUseCase
@@ -212,19 +213,19 @@ class MetadataIndicatorsCalculator @Inject constructor(
         val byUid = allRows.groupBy { it.eventUid }
 
         // per-event color overrides
-        val eventColorById: Map<String, String?> = if (isFreeUser) {
+        val eventColorByKey: Map<EventKey, String?> = if (isFreeUser) {
             emptyMap()
         } else {
             val eventIds = allRows.map { it.eventId }.distinct()
             if (eventIds.isEmpty()) emptyMap()
-            else database.eventsDao().selectEventColorsById(eventIds)
-                .associate { it.id to it.color }
+            else database.eventsDao().selectEventColors(eventIds)
+                .associate { EventKey(it.id, it.calendarId) to it.color }
         }
 
         fun resolveColor(eventId: String, calendarId: String): String? {
             val calColor = colorByCalendarId[calendarId] ?: return null
             if (isFreeUser) return calColor
-            return eventColorById[eventId] ?: calColor
+            return eventColorByKey[EventKey(eventId, calendarId)] ?: calColor
         }
 
         val result = mutableListOf<SkeletonOccurrence>()

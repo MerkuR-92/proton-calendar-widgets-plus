@@ -80,13 +80,15 @@ class UpdateParticipationStatusUseCase @Inject constructor(
         singleEdits?.forEach { event ->
             val mainChanParticipationStatus = mainChainStatus.toParticipationStatus()
             if (event.currentUserAttendeeId == null || event.getParticipationStatus(userEmails) == mainChanParticipationStatus) return@forEach
+            // a single edit can live in a different calendar than the one being cleared
+            val singleEditCalendarId = event.calendar.id
             when (val updateParticipationStatusResponse =
-                calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, ParticipationStatus.NEEDS_ACTION.toInt()) // 0 == NEEDS_ACTION
+                calendarsApi.updateParticipationStatus(userId, singleEditCalendarId, event.id, event.currentUserAttendeeId, ParticipationStatus.NEEDS_ACTION.toInt()) // 0 == NEEDS_ACTION
             ) {
                 is ApiResponse.Success -> {
                     // Clear alarms
                     // TODO Ignore update alarms errors or display snack ?
-                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, event.id, emptyList())
+                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, singleEditCalendarId, event.id, emptyList())
                     updatePersonalPartUseCaseUseCaseResult.ifSuccessAndLogErrors(logger) { }
                 }
                 is ApiResponse.Error -> {
