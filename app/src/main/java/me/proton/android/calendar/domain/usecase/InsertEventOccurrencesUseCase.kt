@@ -20,7 +20,9 @@ class InsertEventOccurrencesUseCase @Inject constructor(
             userId,
             eventEntityMetadata.calendarId,
             eventEntityMetadata.id,
-            eventEntityMetadata.modifyTime
+            eventEntityMetadata.modifyTime,
+            // rows without a startTimeZone predate the column and never refresh via modifyTime alone
+            requireStartTimeZone = eventEntityMetadata.startTimeZone.isNotBlank(),
         )
     }
 

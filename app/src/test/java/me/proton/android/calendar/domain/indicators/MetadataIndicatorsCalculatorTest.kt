@@ -57,6 +57,7 @@ class MetadataIndicatorsCalculatorTest {
         nonRecurring: List<EventOccurrenceEntity> = emptyList(),
         finiteRecurring: List<EventOccurrenceEntity> = emptyList(),
         infiniteRecurring: List<EventOccurrenceEntity> = emptyList(),
+        singleEdits: List<EventOccurrenceEntity> = emptyList(),
         calendars: List<Calendar> = listOf(cal1, cal2),
         hasSubscriptionForMail: Boolean = false,
         eventColorOverrides: Map<String, String?> = emptyMap(),
@@ -72,6 +73,8 @@ class MetadataIndicatorsCalculatorTest {
                 flowOf(finiteRecurring)
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns
                 flowOf(infiniteRecurring)
+        every { occurrencesDao.selectSingleEdits(any(), any()) } returns
+                flowOf(singleEdits)
         every { eventsDao.selectEventColors(any()) } returns eventColorOverrides.map { (id, color) ->
             EventColorRow(id = id, calendarId = "c1", color = color)
         }
@@ -107,6 +110,8 @@ class MetadataIndicatorsCalculatorTest {
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns
                 flowOf(emptyList<EventOccurrenceEntity>())
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns
+                flowOf(emptyList<EventOccurrenceEntity>())
+        every { occurrencesDao.selectSingleEdits(any(), any()) } returns
                 flowOf(emptyList<EventOccurrenceEntity>())
         every { eventsDao.selectEventColors(any()) } returns emptyList()
 
@@ -207,6 +212,103 @@ class MetadataIndicatorsCalculatorTest {
             ),
             result.keys,
         )
+    }
+
+    @Test
+    fun `compute keeps all-day weekly dots on the right day when the row has no startTimeZone`() = runTest {
+        // legacy rows have no startTimeZone; deriving the dummy DTSTART date in a display tz west of UTC renders every dot a day early ("every Friday" event dotted on Thursdays)
+        val displayTz = "America/Toronto" // UTC-4 in June
+        val friday = LocalDate.of(2025, 6, 6)
+        val legacyRow = recurringAllDay("eF", "uF", "c1", friday, "FREQ=WEEKLY")
+            .copy(startTimeZone = "", endTimeZone = "")
+        stubBaseHappyPath(infiniteRecurring = listOf(legacyRow))
+
+        val result = calculator.compute(userId.id, from, to, displayTz).first()
+
+        assertEquals(setOf(friday), result.keys)
+    }
+
+    @Test
+    fun `compute keeps all-day yearly dots on the right day when the row has no startTimeZone`() = runTest {
+        // same as above in birthday-calendar shape
+        val displayTz = "America/Toronto"
+        val firstOccurrence = LocalDate.of(2024, 6, 6)
+        val legacyRow = recurringAllDay("eY", "uY", "c1", firstOccurrence, "FREQ=YEARLY")
+            .copy(startTimeZone = "", endTimeZone = "")
+        stubBaseHappyPath(infiniteRecurring = listOf(legacyRow))
+
+        val result = calculator.compute(userId.id, from, to, displayTz).first()
+
+        assertEquals(setOf(LocalDate.of(2025, 6, 6)), result.keys)
+    }
+
+    @Test
+    fun `compute masks an all-day occurrence whose single edit was moved out of the window`() = runTest {
+        // the 06-06 occurrence was moved to 06-20: no dot may stay on 06-06
+        val parent = recurringAllDay("eA", "uA", "c1", LocalDate.of(2025, 6, 6), "FREQ=WEEKLY")
+        // outside from..to, so only the unwindowed single-edit query sees it
+        val utc = ZoneId.of("UTC")
+        val override = nonRecurring(
+            "eA2", "uA", "c1",
+            LocalDate.of(2025, 6, 20).atStartOfDay(utc),
+            LocalDate.of(2025, 6, 21).atStartOfDay(utc),
+            fullDay = true,
+        ).copy(recurrenceID = LocalDate.of(2025, 6, 6).atStartOfDay(utc).toEpochSecond())
+        stubBaseHappyPath(
+            infiniteRecurring = listOf(parent),
+            nonRecurring = emptyList(),
+            singleEdits = listOf(override),
+        )
+
+        val result = calculator.compute(userId.id, from, to, tz).first()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `compute dots the moved day and not the original day for an in-window single edit`() = runTest {
+        val tzId = "UTC"
+        val z = ZoneId.of(tzId)
+        val dtStart = LocalDate.of(2025, 6, 4).atStartOfDay(z).plusHours(9)
+        val parent = recurring("eP", "uP", "c1", dtStart, "FREQ=WEEKLY", tzId)
+        val override = nonRecurring(
+            "eO", "uP", "c1",
+            LocalDate.of(2025, 6, 5).atStartOfDay(z).plusHours(9),
+            LocalDate.of(2025, 6, 5).atStartOfDay(z).plusHours(10),
+        ).copy(recurrenceID = dtStart.toEpochSecond())
+        stubBaseHappyPath(
+            infiniteRecurring = listOf(parent),
+            nonRecurring = listOf(override),
+            singleEdits = listOf(override),
+        )
+
+        val result = calculator.compute(userId.id, from, to, tzId).first()
+
+        assertEquals(setOf(LocalDate.of(2025, 6, 5)), result.keys)
+    }
+
+    @Test
+    fun `compute masks an occurrence whose single edit was moved out of the window`() = runTest {
+        // the only occurrence in this window was moved to 06-20; a dot here would point at an empty day
+        val tzId = "UTC"
+        val z = ZoneId.of(tzId)
+        val dtStart = LocalDate.of(2025, 6, 4).atStartOfDay(z).plusHours(9)
+        val parent = recurring("eP", "uP", "c1", dtStart, "FREQ=WEEKLY", tzId)
+        // outside from..to, so only the unwindowed single-edit query sees it
+        val override = nonRecurring(
+            "eP2", "uP", "c1",
+            LocalDate.of(2025, 6, 20).atStartOfDay(z).plusHours(9),
+            LocalDate.of(2025, 6, 20).atStartOfDay(z).plusHours(10),
+        ).copy(recurrenceID = dtStart.toEpochSecond())
+        stubBaseHappyPath(
+            infiniteRecurring = listOf(parent),
+            nonRecurring = emptyList(),
+            singleEdits = listOf(override),
+        )
+
+        val result = calculator.compute(userId.id, from, to, tzId).first()
+
+        assertTrue(result.isEmpty())
     }
 
     @Test
