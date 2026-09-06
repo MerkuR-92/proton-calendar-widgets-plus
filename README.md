@@ -37,9 +37,7 @@ A compact **2×2** widget displaying the monthly calendar at a glance.
 
 ## Download
 
-Obtainium
-
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/MerkuR-92/proton-calendar-widgets-plus"> <img src="assets/badge_obtainium.png" alt="Get it on Obtainium" height="48"> </a>
+[![Get it on Obtainium](assets/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/MerkuR-92/proton-calendar-widgets-plus)
 
 Install and track updates automatically through Obtainium.
 
