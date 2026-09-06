@@ -1,4 +1,4 @@
-# Proton Calendar Widgets+
+<h1 align="center">Proton Calendar Widgets+</h1>
 
 A custom fork of [Proton Calendar](https://github.com/ProtonMail/android-calendar) focused on expanding and redesigning its Android home-screen widgets.
 
@@ -8,9 +8,13 @@ This project is based on the **latest Proton Calendar release** and preserves th
 
 ### Agenda
 
+<img src="/assets/widget-agenda-light.png" alt="Agenda light" width="250">   <img src="/assets/widget-agenda-dark.png" alt="Agenda dark" width="250">
+
 The original Proton Calendar widget design.
 
 ### Month & Agenda
+
+<img src="/assets/widget-month-agenda-light.png" alt="Month & Agenda light" width="400">   <img src="/assets/widget-month-agenda-dark.png" alt="Month & Agenda dark" width="400">
 
 A **4×2** widget combining:
 
@@ -21,6 +25,8 @@ A **4×2** widget combining:
 * Support for months requiring a sixth calendar row.
 
 ### Monthly
+
+<img src="/assets/widget-monthly-light.png" alt="Monthly light" width="150">   <img src="/assets/widget-monthly-dark.png" alt="Monthly dark" width="150">
 
 A compact **2×2** widget displaying the monthly calendar at a glance.
 
@@ -36,7 +42,9 @@ A compact **2×2** widget displaying the monthly calendar at a glance.
 * Separate layouts and `RemoteViewsService` implementations for each widget.
 
 ## Download
-[![Get it on Obtainium](https://raw.githubusercontent.com/MerkuR-92/proton-calendar-widgets-plus/main/assets/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/MerkuR-92/proton-calendar-widgets-plus)
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/MerkuR-92/proton-calendar-widgets-plus">
+  <img src="/assets/badge_obtainium.png" alt="Get it on Obtainium" height="120">
+</a> 
 
 Install and track updates automatically through Obtainium.
 
