@@ -1,46 +1,70 @@
-# Proton Calendar for Android 
+# Proton Calendar Widgets+
 
-This is the Proton Calendar client for Android for managing events and calendars on your Android devices.
+A custom fork of [Proton Calendar](https://github.com/ProtonMail/android-calendar) focused on expanding and redesigning its Android home-screen widgets.
 
-## Set up
+This project is based on the **latest Proton Calendar release** and preserves the original Agenda widget while adding two additional widget designs.
 
-Open the project in the latest Android Studio.
-Run Gradle sync if not prompted and let Gradle download the dependencies. The dependencies are all available publicly.
+## Widgets
 
-## Build variants
+### Agenda
 
-### Commonly used variants
+The original Proton Calendar widget design.
 
-| Scheme        | Description                                                                                            |
-|:--------------|:-------------------------------------------------------------------------------------------------------|
-| `devDebug`    | Debug variant, points to the Black API environment (only accessible through the internal Proton VPN)   |
-| `devRelease`  | Release variant, points to the Black API environment (only accessible through the internal Proton VPN) |
-| `prodDebug`   | Debug variant, points to the production API environment                                                |
-| `prodRelease` | Release variant, points to the production API environment                                              |
+### Month & Agenda
 
-### Testing
+A **4×2** widget combining:
 
-Run tests:
-`./gradlew testDebugUnitTest testDevDebugUnitTest`
+* A full monthly calendar.
+* The current date and upcoming events.
+* Dynamic week-start day based on Proton Calendar user settings.
+* Highlighting for the current day and Sundays.
+* Support for months requiring a sixth calendar row.
 
-## Modules
+### Monthly
 
-### App
+A compact **2×2** widget displaying the monthly calendar at a glance.
 
-The main app module. Contains most of the calendar functionalities.
+## Highlights
 
-### Shared test code
+* Three independent widget designs.
+* Original Agenda widget preserved.
+* Custom monthly calendar layout.
+* Dynamic six-week calendar support without unnecessary empty rows.
+* Week-start configuration follows Proton Calendar settings.
+* Improved widget refresh handling across all three designs.
+* Stable event list IDs for smoother updates and scrolling.
+* Separate layouts and `RemoteViewsService` implementations for each widget.
 
-Testing utilities to be used in the app module.
+## Download
 
-### Week view core
+Prebuilt APKs are available from the project's [GitHub Releases](../../releases).
 
-An adaptation of https://github.com/alamkanak/Android-Week-View used for week view display (day-view, 3-day-view, week-view).
+The APK is signed with a separate signing key for this fork and is intended for installation outside Google Play.
 
-## Contributing notice
+## Installation
 
-This project does not accept external contributions.
+Download the latest APK from the Releases page and install it on your Android device.
+
+Because this is a custom build with its own signing key, it cannot be installed as an update over the official Proton Calendar app. An existing installation signed with the official Proton key must be removed before installing this fork.
+
+Future updates of this fork can be installed over previous versions of the fork as long as the same signing key is retained.
+
+## Development
+
+This repository tracks the latest Proton Calendar releases while maintaining custom widget-related changes.
+
+The main branch for this project is:
+
+`main`
+
+The official Proton Calendar repository is configured as the upstream source so that future Proton releases can be integrated into this fork.
+
+## Disclaimer
+
+This is an independent community fork and is **not an official Proton product**.
+
+Proton Calendar and the Proton Calendar source code remain the property of Proton AG.
 
 ## License
 
-The code and data files in this distribution are licensed under the terms of the GPLv3 as published by the Free Software Foundation. See https://www.gnu.org/licenses/ for a copy of this license.
+This project follows the license of the upstream [Proton Calendar repository](https://github.com/ProtonMail/android-calendar).
