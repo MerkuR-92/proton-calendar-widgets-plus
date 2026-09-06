@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.AppWidgetRefresher
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.CryptoImpl
 import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
@@ -108,7 +108,7 @@ abstract class CalendarsBindModule {
 
     @Binds
     @Singleton
-    abstract fun bindWidgetRefresher(widgetRefresher: CalendarWidgetRefresher): WidgetRefresher
+    abstract fun bindWidgetRefresher(widgetRefresher: AppWidgetRefresher): WidgetRefresher
 
     @Binds
     abstract fun bindValueStoreProvider(valueStoreProviderImpl: ValueStoreProviderImpl): ValueStoreProvider

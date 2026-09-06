@@ -2,16 +2,13 @@ package me.proton.android.calendar
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
-import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
 import me.proton.android.calendar.domain.Logger
@@ -19,64 +16,9 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDate
-import javax.inject.Inject
 import javax.inject.Singleton
 
-interface WidgetRefresher {
-    /**
-     * Sends a broadcast to force-refresh all the app-widgets.
-     */
-    fun broadcastRefresh()
-
-    /**
-     * A special broadcast to let the widget know to observe post-login events for a short while.
-     */
-    fun broadcastPostLoginRefresh()
-
-    /**
-     * Refreshes all Event lists in all Widgets using AppWidgetManager (without broadcast).
-     */
-    fun refreshEventList()
-}
-
-@Singleton
-class CalendarWidgetRefresher @Inject constructor(
-    @ApplicationContext private val context: Context
-) : WidgetRefresher {
-
-    override fun broadcastRefresh() {
-        broadcast(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-    }
-
-    override fun broadcastPostLoginRefresh() {
-        broadcast(ACTION_WIDGET_REFRESH_AFTER_LOGIN)
-    }
-
-    override fun refreshEventList() {
-        broadcast(ACTION_WIDGET_DEFERRED_REFRESH)
-    }
-
-    private fun broadcast(intentAction: String) {
-        val mgr = AppWidgetManager.getInstance(context)
-        val ids = mgr.getAppWidgetIds(ComponentName(context, CalendarWidget::class.java))
-
-        context.sendBroadcast(
-            Intent(context, CalendarWidget::class.java).apply {
-                action = intentAction
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-                data = Uri.parse("protoncalendar://widget/refresh/full")
-            }
-        )
-    }
-}
-
-private const val ACTION_WIDGET_REFRESH_AFTER_LOGIN =
-    "me.proton.android.calendar.action.WIDGET_REFRESH_AFTER_LOGIN"
-
-private const val ACTION_WIDGET_DEFERRED_REFRESH =
-    "me.proton.android.calendar.action.WIDGET_DEFERRED_REFRESH"
-
-class CalendarWidget : AppWidgetProvider(), KoinComponent {
+class CalendarMonthAgendaWidget : AppWidgetProvider(), KoinComponent {
 
     private val coordinator: CalendarWidgetUpdateCoordinator by inject()
 
@@ -125,18 +67,19 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
     }
 }
 
-internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComponent {
+internal class CalendarMonthAgendaWidgetService : RemoteViewsService(), KoinComponent {
     override fun onGetViewFactory(intent: Intent?): RemoteViewsFactory {
         val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             ?: AppWidgetManager.INVALID_APPWIDGET_ID
-        return CalendarWidgetRemoteViewsFactory(widgetId)
+        return CalendarMonthAgendaWidgetFactory(widgetId)
     }
 }
 
-internal class CalendarWidgetRemoteViewsFactory(
+internal class CalendarMonthAgendaWidgetFactory(
     private val appWidgetId: Int
 ) : RemoteViewsService.RemoteViewsFactory, KoinComponent {
 
+    private val context: Context by inject()
     private val cache: WidgetContentCache by inject()
     private val coordinator: CalendarWidgetUpdateCoordinator by inject()
     private val logger: Logger by inject()
@@ -159,10 +102,6 @@ internal class CalendarWidgetRemoteViewsFactory(
             data = cached.events
             return
         }
-        // process restarted / cache missed: request a refresh and show empty until coordinator repopulates.
-        // use requestRefreshIfIdle to avoid cancelling an in-progress refresh via collectLatest -
-        // this cache-miss callback can fire as a side effect of the coordinator itself emitting a
-        // loading state, which would otherwise create a feedback loop.
         coordinator.requestRefreshIfIdle()
         data = emptyList()
     }
@@ -175,13 +114,24 @@ internal class CalendarWidgetRemoteViewsFactory(
             return null
         }
 
-        val rv = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.item_widget)
+        val rv = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.item_widget_month_agenda)
 
         // date column
-        val showDate = event.showDateColumn
-        rv.setViewVisibility(R.id.rl_event_day_container, if (showDate) View.VISIBLE else View.INVISIBLE)
-        rv.setTextViewText(R.id.tv_event_day_of_week, if (showDate) event.happensOn.formatDayOfWeekMedium() else "")
-        rv.setTextViewText(R.id.tv_event_day_of_month, if (showDate) event.happensOn.dayOfMonth.toString() else "")
+        val today = LocalDate.now()
+        val showDate = event.showDateColumn && event.happensOn != today
+        rv.setViewVisibility(R.id.rl_event_day_container, if (showDate) View.VISIBLE else View.GONE)
+        
+        if (showDate) {
+            val dayOfWeekShort = event.happensOn.formatDayOfWeekMedium()
+            val dayOfMonth = event.happensOn.dayOfMonth.toString()
+            
+            rv.setTextViewText(R.id.tv_event_day_of_week, dayOfWeekShort)
+            rv.setTextColor(R.id.tv_event_day_of_week, context.getColor(R.color.text_weak))
+            
+            rv.setTextViewText(R.id.tv_event_day_of_month, dayOfMonth)
+            rv.setTextColor(R.id.tv_event_day_of_month, context.getColor(R.color.text_norm))
+            rv.setViewVisibility(R.id.tv_event_day_of_month, View.VISIBLE)
+        }
 
         // headers - strikethrough flags
         val flags = if (event.isCancelledOrDeclined) {
@@ -198,6 +148,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             event.fullDayCounter?.let { " $it" } ?: ""
         )
         rv.setTextViewText(R.id.tv_event_subheader, event.subheaderContent)
+        rv.setViewVisibility(R.id.tv_event_subheader, if (event.subheaderContent.isEmpty()) View.GONE else View.VISIBLE)
         // decryption error UI
         rv.setViewVisibility(R.id.decryption_error_view, if (event.failedToDecrypt) View.VISIBLE else View.INVISIBLE)
         rv.setViewVisibility(R.id.decryption_error_icon, if (event.failedToDecrypt) View.VISIBLE else View.INVISIBLE)
@@ -241,24 +192,10 @@ internal class CalendarWidgetRemoteViewsFactory(
         RemoteViews(BuildConfig.APPLICATION_ID, R.layout.item_widget_loading)
 
     override fun getViewTypeCount(): Int = 1
-    override fun getItemId(position: Int): Long = position.toLong()
-    override fun hasStableIds(): Boolean = false
+    override fun getItemId(position: Int): Long {
+        val event = data.getOrNull(position) ?: return position.toLong()
+        return (event.id + event.calendarId + event.happensOn.toString() + event.occurrenceNumber + event.showNoEventsToday).hashCode().toLong()
+    }
+    override fun hasStableIds(): Boolean = true
 }
 
-data class WidgetEvent(
-    val id: String,
-    val calendarId: String,
-    val summary: String,
-    val subheaderContent: String,
-    val isCancelledOrDeclined: Boolean,
-    val needsAction: Boolean,
-    val failedToDecrypt: Boolean,
-    // LocalDate that this Event spans, not necessarily the same as dateStart
-    val happensOn: LocalDate,
-    val showDateColumn: Boolean,
-    val showBottomSpacing: Boolean,
-    val showNoEventsToday: Boolean,
-    val fullDayCounter: String?,
-    val occurrenceNumber: Int,
-    val color: String,
-)

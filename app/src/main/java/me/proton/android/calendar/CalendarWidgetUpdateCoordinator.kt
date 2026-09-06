@@ -39,8 +39,11 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getPrimaryAccount
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.WeekFields
+import java.util.Locale
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -179,8 +182,12 @@ class CalendarWidgetUpdateCoordinator(
         val ctx = createFreshContext()
         val resourceProvider = ResourceProviderImpl(ctx.resources)
         val mgr = AppWidgetManager.getInstance(ctx)
-        val ids = mgr.getAppWidgetIds(ComponentName(ctx, CalendarWidget::class.java))
-        if (ids.isEmpty()) return
+        
+        val monthAgendaIds = mgr.getAppWidgetIds(ComponentName(ctx, CalendarMonthAgendaWidget::class.java))
+        val agendaIds = mgr.getAppWidgetIds(ComponentName(ctx, CalendarAgendaWidget::class.java))
+        val monthOnlyIds = mgr.getAppWidgetIds(ComponentName(ctx, CalendarMonthWidget::class.java))
+        
+        if (monthAgendaIds.isEmpty() && agendaIds.isEmpty() && monthOnlyIds.isEmpty()) return
 
         val ck = WidgetConfigKey.current(ctx)
 
@@ -191,15 +198,26 @@ class CalendarWidgetUpdateCoordinator(
             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR
         )
 
+        val account = accountManager.getPrimaryAccount().firstOrNull()
+        val firstDayOfWeek = account?.userId?.let {
+            userSettingsRepository.getUserSettingsEntity(it, database).weekStartDayOfWeek()
+        } ?: WeekFields.of(Locale.getDefault()).firstDayOfWeek
+
         val loadingState = WidgetRenderState(
             headerDayOfWeek = headerDayOfWeek,
             headerMonthAndDay = monthAndDay,
             infoText = resourceProvider.provideString(R.string.calendar_widget_loading_events),
-            showButtons = false
+            showButtons = false,
+            firstDayOfWeek = firstDayOfWeek
         )
         if (loadingState != emittedLoadingState) {
-            ids.forEach { id -> mgr.updateAppWidget(id, loadingState.render(ctx, id)) }
-            mgr.notifyAppWidgetViewDataChanged(ids, R.id.lv_widget)
+            monthAgendaIds.forEach { id -> mgr.updateAppWidget(id, loadingState.render(ctx, id, CalendarWidgetRenderer.WidgetType.MonthAgenda)) }
+            agendaIds.forEach { id -> mgr.updateAppWidget(id, loadingState.render(ctx, id, CalendarWidgetRenderer.WidgetType.Agenda)) }
+            monthOnlyIds.forEach { id -> mgr.updateAppWidget(id, loadingState.render(ctx, id, CalendarWidgetRenderer.WidgetType.MonthOnly)) }
+            
+            if (monthAgendaIds.isNotEmpty()) mgr.notifyAppWidgetViewDataChanged(monthAgendaIds, R.id.lv_widget)
+            if (agendaIds.isNotEmpty()) mgr.notifyAppWidgetViewDataChanged(agendaIds, R.id.lv_widget)
+            
             emittedLoadingState = loadingState
         }
 
@@ -209,13 +227,21 @@ class CalendarWidgetUpdateCoordinator(
             ck = ck,
             headerDayOfWeek = headerDayOfWeek,
             monthAndDay = monthAndDay,
+            firstDayOfWeek = firstDayOfWeek,
         )
 
         // populate caches and notify
-        ids.forEach { id -> cache.put(id, content) }
+        monthAgendaIds.forEach { id -> cache.put(id, content) }
+        agendaIds.forEach { id -> cache.put(id, content) }
+        monthOnlyIds.forEach { id -> cache.put(id, content) }
+        
         val finalState = content.renderState.copy(adapterVersion = System.currentTimeMillis())
-        ids.forEach { id -> mgr.updateAppWidget(id, finalState.render(ctx, id)) }
-        mgr.notifyAppWidgetViewDataChanged(ids, R.id.lv_widget)
+        monthAgendaIds.forEach { id -> mgr.updateAppWidget(id, finalState.render(ctx, id, CalendarWidgetRenderer.WidgetType.MonthAgenda)) }
+        agendaIds.forEach { id -> mgr.updateAppWidget(id, finalState.render(ctx, id, CalendarWidgetRenderer.WidgetType.Agenda)) }
+        monthOnlyIds.forEach { id -> mgr.updateAppWidget(id, finalState.render(ctx, id, CalendarWidgetRenderer.WidgetType.MonthOnly)) }
+        
+        if (monthAgendaIds.isNotEmpty()) mgr.notifyAppWidgetViewDataChanged(monthAgendaIds, R.id.lv_widget)
+        if (agendaIds.isNotEmpty()) mgr.notifyAppWidgetViewDataChanged(agendaIds, R.id.lv_widget)
     }
 
     private suspend fun loadEvents(
@@ -224,10 +250,11 @@ class CalendarWidgetUpdateCoordinator(
         ck: String,
         headerDayOfWeek: String,
         monthAndDay: String,
+        firstDayOfWeek: DayOfWeek,
     ): WidgetContent {
         val zoneId = ZoneId.systemDefault()
         val fromDate = LocalDate.now(zoneId)
-        val toDate = fromDate.plusDays(CalendarWidget.WIDGET_DAYS_AHEAD.toLong())
+        val toDate = fromDate.plusDays(CalendarMonthAgendaWidget.WIDGET_DAYS_AHEAD.toLong())
 
         val account = accountManager.getPrimaryAccount().firstOrNull()
         val userId = account?.userId
@@ -239,6 +266,7 @@ class CalendarWidgetUpdateCoordinator(
                     headerMonthAndDay = monthAndDay,
                     infoText = resourceProvider.provideString(R.string.calendar_widget_please_log_in),
                     showButtons = false,
+                    firstDayOfWeek = firstDayOfWeek,
                 ),
                 configKey = ck
             )
@@ -252,14 +280,15 @@ class CalendarWidgetUpdateCoordinator(
                     headerDayOfWeek = headerDayOfWeek,
                     headerMonthAndDay = monthAndDay,
                     infoText = resourceProvider.provideString(R.string.calendar_widget_please_log_in),
-                    showButtons = false
+                    showButtons = false,
+                    firstDayOfWeek = firstDayOfWeek,
                 ),
                 configKey = ck
             )
         }
 
-        val is24h = userSettingsRepository.getUserSettingsEntity(userId, database)
-            .timeFormatIs24Hour(DateFormat.is24HourFormat(context))
+        val userSettings = userSettingsRepository.getUserSettingsEntity(userId, database)
+        val is24h = userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(context))
 
         val res = withTimeoutOrNull(1.minutes) {
             getUiEventsUseCase.execute(userId, fromDate, toDate, zoneId.id)
@@ -273,7 +302,8 @@ class CalendarWidgetUpdateCoordinator(
                     headerDayOfWeek = headerDayOfWeek,
                     headerMonthAndDay = monthAndDay,
                     infoText = resourceProvider.provideString(R.string.calendar_widget_loading_events_error),
-                    showButtons = true
+                    showButtons = true,
+                    firstDayOfWeek = firstDayOfWeek,
                 ),
                 configKey = ck
             )
@@ -287,6 +317,7 @@ class CalendarWidgetUpdateCoordinator(
                     headerMonthAndDay = monthAndDay,
                     infoText = resourceProvider.provideString(R.string.calendar_widget_loading_events_error),
                     showButtons = true,
+                    firstDayOfWeek = firstDayOfWeek,
                 ),
                 configKey = ck
             )
@@ -299,6 +330,7 @@ class CalendarWidgetUpdateCoordinator(
                         headerMonthAndDay = monthAndDay,
                         infoText = resourceProvider.provideString(R.string.calendar_widget_loading_events),
                         showButtons = true,
+                        firstDayOfWeek = firstDayOfWeek,
                     ),
                     configKey = ck
                 )
@@ -318,7 +350,8 @@ class CalendarWidgetUpdateCoordinator(
                         headerDayOfWeek = headerDayOfWeek,
                         headerMonthAndDay = monthAndDay,
                         infoText = snapshot.statusText,
-                        showButtons = snapshot.showButtons
+                        showButtons = snapshot.showButtons,
+                        firstDayOfWeek = firstDayOfWeek,
                     ),
                     configKey = ck
                 )

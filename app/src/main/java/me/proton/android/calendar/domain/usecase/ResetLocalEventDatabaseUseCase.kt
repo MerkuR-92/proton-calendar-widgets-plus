@@ -1,6 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.AppWidgetRefresher
 import me.proton.android.calendar.common.getWeekStart
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.data.db.AppDatabase
@@ -23,7 +23,7 @@ class ResetLocalEventDatabaseUseCase @Inject constructor(
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val userSettingsRepository: UserSettingsRepository,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val widgetRefresher: CalendarWidgetRefresher,
+    private val widgetRefresher: AppWidgetRefresher,
     private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) {
 

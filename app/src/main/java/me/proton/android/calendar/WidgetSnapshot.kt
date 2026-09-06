@@ -63,6 +63,7 @@ internal fun List<UiEvent>.toWidgetSnapshot(
                 showDateColumn = true,
                 showBottomSpacing = true,
                 showNoEventsToday = true,
+                isAllDay = false,
                 color = resourceProvider.provideString(R.color.separator_norm)
             )
         )
@@ -98,7 +99,7 @@ private fun UiEvent.toWidgetEvent(
     } else null
 
     val dateText = if (this.isAllDay) {
-        resourceProvider.provideString(R.string.event_all_day)
+        ""
     } else {
         if (fullDayCounter.second > 1) { // multi-day part-day
             when (fullDayCounter.first) {
@@ -117,7 +118,7 @@ private fun UiEvent.toWidgetEvent(
                 }
 
                 else -> { // day in the middle
-                    resourceProvider.provideString(R.string.event_all_day)
+                    ""
                 }
             }
         } else { // single-day part-day
@@ -140,6 +141,7 @@ private fun UiEvent.toWidgetEvent(
         summary = this.summary?.replace("\n", " ")?.takeIfNotBlank()
             ?: resourceProvider.provideString(R.string.default_event_summary),
         subheaderContent = subheaderContent,
+        isAllDay = this.isAllDay,
         happensOn = happensOn,
         showDateColumn = showDateColumn,
         showBottomSpacing = showBottomSpacing,

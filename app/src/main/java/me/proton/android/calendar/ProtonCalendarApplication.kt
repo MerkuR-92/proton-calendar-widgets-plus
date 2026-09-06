@@ -125,7 +125,13 @@ class ProtonCalendarApplication : Application() {
     }
 
     private fun refreshWidget() {
-        val widgetComponent = ComponentName(this, CalendarWidget::class.java)
+        refreshWidget(CalendarMonthAgendaWidget::class.java)
+        refreshWidget(CalendarAgendaWidget::class.java)
+        refreshWidget(CalendarMonthWidget::class.java)
+    }
+
+    private fun refreshWidget(providerClass: Class<*>) {
+        val widgetComponent = ComponentName(this, providerClass)
         val mgr = AppWidgetManager.getInstance(this)
         val ids = mgr.getAppWidgetIds(widgetComponent)
         if (ids.isNotEmpty()) {

@@ -15,7 +15,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.AppWidgetRefresher
 import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.getUserSettingsEntityFlow
 import me.proton.android.calendar.common.logger.TestsLogger
@@ -79,7 +79,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val handleDeleteUseCaseMock: HandleDeleteUseCase = mockk()
     val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
     val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
-    val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
+    val calendarWidgetRefresherMock: AppWidgetRefresher = mockk()
     val upgradeEventUseCaseMock: UpgradeEventUseCase = mockk()
     val workManagerMock: WorkManager = mockk()
     val updatePersonalPartUseCase: UpdatePersonalPartUseCase = mockk()

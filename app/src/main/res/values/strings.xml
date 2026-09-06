@@ -588,6 +588,12 @@
     <string name="dialog_feedback_submit_thank_you">Thank you! Your feedback helps us improve Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Proton Calendar widget</string>
+    <string name="widget_agenda_label" translatable="false">Agenda</string>
+    <string name="widget_month_agenda_label" translatable="false">Month &amp; Agenda</string>
+    <string name="widget_month_only_label" translatable="false">Monthly Calendar</string>
+    <string name="widget_agenda_description" translatable="false">Detailed list of your upcoming events.</string>
+    <string name="widget_month_agenda_description" translatable="false">Monthly calendar along with your event agenda.</string>
+    <string name="widget_month_only_description" translatable="false">Quick view of the current month.</string>
     <string name="calendar_widget_no_upcoming_events_today">No upcoming events today</string>
     <string name="calendar_widget_loading_events">Loading events…</string>
     <string name="calendar_widget_loading_events_error">Could not load events</string>

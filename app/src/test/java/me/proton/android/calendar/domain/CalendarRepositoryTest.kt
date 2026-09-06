@@ -28,7 +28,7 @@ import me.proton.core.util.kotlin.DispatcherProvider
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.AppWidgetRefresher
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
@@ -83,7 +83,7 @@ internal class CalendarRepositoryTest {
     private val fetchEventsUseCaseMock: FetchEventsUseCase = mockk()
     private val getEventWithCommentsUseCaseMock: GetEventWithCommentsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
-    private val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
+    private val calendarWidgetRefresherMock: AppWidgetRefresher = mockk()
     private val eventDecryptorMock: EventDecryptor = mockk()
     private val searchDatabaseMock: SearchDatabase = mockk()
     private val indexEventForSearchUseCaseMock: IndexEventForSearchUseCase = mockk()

@@ -37,7 +37,7 @@ internal class WidgetSnapshotTest {
         val snapshot = events.toWidgetSnapshot(
             resourceProvider = resourceProvider,
             fromDate = today,
-            toDate = today.plusDays(CalendarWidget.WIDGET_DAYS_AHEAD.toLong()),
+            toDate = today.plusDays(CalendarMonthAgendaWidget.WIDGET_DAYS_AHEAD.toLong()),
             zoneId = zone,
             is24Hour = true,
         )
@@ -65,7 +65,7 @@ internal class WidgetSnapshotTest {
         events.toWidgetSnapshot(
             resourceProvider = resourceProvider,
             fromDate = today,
-            toDate = today.plusDays(CalendarWidget.WIDGET_DAYS_AHEAD.toLong()),
+            toDate = today.plusDays(CalendarMonthAgendaWidget.WIDGET_DAYS_AHEAD.toLong()),
             zoneId = zone,
             is24Hour = true,
         )
@@ -95,7 +95,7 @@ internal class WidgetSnapshotTest {
         val snapshot = events.toWidgetSnapshot(
             resourceProvider = resourceProvider,
             fromDate = today,
-            toDate = today.plusDays(CalendarWidget.WIDGET_DAYS_AHEAD.toLong()),
+            toDate = today.plusDays(CalendarMonthAgendaWidget.WIDGET_DAYS_AHEAD.toLong()),
             zoneId = zone,
             is24Hour = true,
         )

@@ -579,6 +579,12 @@
     <string name="dialog_feedback_submit_thank_you">¡Gracias! Tus comentarios nos ayudan a mejorar Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Widget de Proton Calendar</string>
+    <string name="widget_agenda_label">Agenda</string>
+    <string name="widget_month_agenda_label">Mes y Agenda</string>
+    <string name="widget_month_only_label">Calendario Mensual</string>
+    <string name="widget_agenda_description">Lista detallada de tus próximos eventos.</string>
+    <string name="widget_month_agenda_description">Calendario mensual junto con tu agenda de eventos.</string>
+    <string name="widget_month_only_description">Vista rápida del mes actual.</string>
     <string name="calendar_widget_no_upcoming_events_today">No hay eventos próximos para hoy.</string>
     <string name="calendar_widget_loading_events">Cargando eventos…</string>
     <string name="calendar_widget_loading_events_error">No se han podido cargar los eventos.</string>

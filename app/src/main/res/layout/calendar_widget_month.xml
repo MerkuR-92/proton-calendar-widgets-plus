@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_calendar_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    style="@style/Widget.ProtonCalendar.AppWidget.Container"
+    android:theme="@style/AppWidgetContainer"
+    android:padding="8dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/tv_month_year"
+        style="@style/Text.Subheadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/widget_4x2_header_height"
+        android:gravity="center"
+        tools:text="Septiembre" />
+
+    <!-- Week Headers -->
+    <LinearLayout
+        android:id="@+id/ll_week_headers"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_4x2_week_headers_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <TextView android:id="@+id/week_day_0" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="D" />
+        <TextView android:id="@+id/week_day_1" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="L" />
+        <TextView android:id="@+id/week_day_2" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="M" />
+        <TextView android:id="@+id/week_day_3" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="M" />
+        <TextView android:id="@+id/week_day_4" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="J" />
+        <TextView android:id="@+id/week_day_5" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="V" />
+        <TextView android:id="@+id/week_day_6" style="@style/Text.DefaultSmall.Strong" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="S" />
+    </LinearLayout>
+
+    <!-- Calendar Grid 7x6 -->
+    <LinearLayout
+        android:id="@+id/ll_calendar_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingBottom="4dp">
+
+        <!-- Week 0 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/day_0" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="28" />
+            <TextView android:id="@+id/day_1" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="29" />
+            <TextView android:id="@+id/day_2" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="30" />
+            <TextView android:id="@+id/day_3" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="31" />
+            <TextView android:id="@+id/day_4" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="1" />
+            <TextView android:id="@+id/day_5" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="2" />
+            <TextView android:id="@+id/day_6" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="3" />
+        </LinearLayout>
+
+        <!-- Week 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/day_7" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="4" />
+            <TextView android:id="@+id/day_8" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="5" />
+            <TextView android:id="@+id/day_9" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="6" />
+            <TextView android:id="@+id/day_10" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="7" />
+            <TextView android:id="@+id/day_11" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="8" />
+            <TextView android:id="@+id/day_12" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="9" />
+            <TextView android:id="@+id/day_13" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="10" />
+        </LinearLayout>
+
+        <!-- Week 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/day_14" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="11" />
+            <TextView android:id="@+id/day_15" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="12" />
+            <TextView android:id="@+id/day_16" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="13" />
+            <TextView android:id="@+id/day_17" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="14" />
+            <TextView android:id="@+id/day_18" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="15" />
+            <TextView android:id="@+id/day_19" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="16" />
+            <TextView android:id="@+id/day_20" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="17" />
+        </LinearLayout>
+
+        <!-- Week 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/day_21" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="18" />
+            <TextView android:id="@+id/day_22" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="19" />
+            <TextView android:id="@+id/day_23" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="20" />
+            <TextView android:id="@+id/day_24" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="21" />
+            <TextView android:id="@+id/day_25" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="22" />
+            <TextView android:id="@+id/day_26" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="23" />
+            <TextView android:id="@+id/day_27" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="24" />
+        </LinearLayout>
+
+        <!-- Week 4 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/day_28" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="25" />
+            <TextView android:id="@+id/day_29" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="26" />
+            <TextView android:id="@+id/day_30" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="27" />
+            <TextView android:id="@+id/day_31" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="28" />
+            <TextView android:id="@+id/day_32" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="29" />
+            <TextView android:id="@+id/day_33" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="30" />
+            <TextView android:id="@+id/day_34" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="1" />
+        </LinearLayout>
+
+        <!-- Week 5 -->
+        <LinearLayout
+            android:id="@+id/ll_widget_week_5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+            <TextView android:id="@+id/day_35" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="2" />
+            <TextView android:id="@+id/day_36" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="3" />
+            <TextView android:id="@+id/day_37" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="4" />
+            <TextView android:id="@+id/day_38" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="5" />
+            <TextView android:id="@+id/day_39" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="6" />
+            <TextView android:id="@+id/day_40" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="7" />
+            <TextView android:id="@+id/day_41" style="@style/Text.DefaultSmall" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:includeFontPadding="false" android:textSize="12sp" tools:text="8" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

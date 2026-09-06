@@ -2,8 +2,10 @@ package me.proton.android.calendar
 
 import android.content.Context
 import android.text.format.DateFormat
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.WeekFields
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
@@ -12,6 +14,7 @@ data class WidgetRenderState(
     val headerMonthAndDay: String,
     val infoText: String?,
     val showButtons: Boolean,
+    val firstDayOfWeek: DayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek,
     val adapterVersion: Long = System.currentTimeMillis(),
 )
 
@@ -19,6 +22,25 @@ data class WidgetContent(
     val events: List<WidgetEvent>,
     val renderState: WidgetRenderState,
     val configKey: String,
+)
+
+data class WidgetEvent(
+    val id: String,
+    val calendarId: String,
+    val summary: String,
+    val subheaderContent: String,
+    val isAllDay: Boolean,
+    val isCancelledOrDeclined: Boolean,
+    val needsAction: Boolean,
+    val failedToDecrypt: Boolean,
+    // LocalDate that this Event spans, not necessarily the same as dateStart
+    val happensOn: LocalDate,
+    val showDateColumn: Boolean,
+    val showBottomSpacing: Boolean,
+    val showNoEventsToday: Boolean,
+    val fullDayCounter: String?,
+    val occurrenceNumber: Int,
+    val color: String,
 )
 
 interface WidgetContentCache {

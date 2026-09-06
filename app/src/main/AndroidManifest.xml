@@ -196,8 +196,9 @@
             android:theme="@style/ProtonTheme.Transparent" />
 
         <receiver
-            android:name="me.proton.android.calendar.CalendarWidget"
-            android:exported="true">
+            android:name="me.proton.android.calendar.CalendarMonthAgendaWidget"
+            android:exported="true"
+            android:label="@string/widget_month_agenda_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -208,11 +209,50 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/calendar_widget_info" />
+                android:resource="@xml/calendar_widget_month_agenda_info" />
+        </receiver>
+
+        <receiver
+            android:name="me.proton.android.calendar.CalendarAgendaWidget"
+            android:exported="true"
+            android:label="@string/widget_agenda_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/calendar_widget_agenda_info" />
+        </receiver>
+
+        <receiver
+            android:name="me.proton.android.calendar.CalendarMonthWidget"
+            android:exported="true"
+            android:label="@string/widget_month_only_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/calendar_widget_month_info" />
         </receiver>
 
         <service
-            android:name=".CalendarWidgetRemoteViewsService"
+            android:name=".CalendarMonthAgendaWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".CalendarAgendaWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
