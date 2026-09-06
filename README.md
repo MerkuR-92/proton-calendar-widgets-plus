@@ -37,6 +37,12 @@ A compact **2×2** widget displaying the monthly calendar at a glance.
 
 ## Download
 
+Obtainium
+
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/MerkuR-92/proton-calendar-widgets-plus"> <img src="assets/badge_obtainium.png" alt="Get it on Obtainium" height="48"> </a>
+
+Install and track updates automatically through Obtainium.
+
 Prebuilt APKs are available from the project's [GitHub Releases](../../releases).
 
 The APK is signed with a separate signing key for this fork and is intended for installation outside Google Play.
