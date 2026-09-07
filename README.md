@@ -64,9 +64,7 @@ Future updates of this fork can be installed over previous versions of the fork 
 
 This repository tracks the latest Proton Calendar releases while maintaining custom widget-related changes.
 
-The main branch for this project is:
-
-`main`
+The main branch for this project is `main`
 
 The official Proton Calendar repository is configured as the upstream source so that future Proton releases can be integrated into this fork.
 
