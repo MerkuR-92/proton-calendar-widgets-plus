@@ -8,7 +8,7 @@ This project is based on the **latest Proton Calendar release** and preserves th
 
 ### Agenda
 
-<img src="/assets/widget-agenda-light.png" alt="Agenda light" width="250">   <img src="/assets/widget-agenda-dark.png" alt="Agenda dark" width="250">
+<img src="/assets/widget-agenda-light.png" alt="Agenda light" width="200">   <img src="/assets/widget-agenda-dark.png" alt="Agenda dark" width="200">
 
 The original Proton Calendar widget design.
 
